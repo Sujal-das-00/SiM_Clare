@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/audit/exceptions-audit.json",
+    "files": [
+        {
+            "date": 1770963430632,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/exceptions/13-02-2026-exceptions.log",
+            "hash": "366eb04c8333485828fef6e73fcefa9cb1f55e6827320d84938bf0b72e02d488"
+        }
+    ],
+    "hashType": "sha256"
+}

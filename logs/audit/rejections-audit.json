@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/audit/rejections-audit.json",
+    "files": [
+        {
+            "date": 1770963430633,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/13-02-2026-rejections.log",
+            "hash": "e6de92e4a754075336a0c828927dc72684e6ad17bd90f3e4016284d93b2588ce"
+        }
+    ],
+    "hashType": "sha256"
+}
