@@ -1,0 +1,17 @@
+import { verifyOtpService } from "../models/models.verifyOtp.js";
+import { handelResponse } from "../utils/errorHandeler.js";
+
+export const verifyOtp = async (req,res,next) => {
+    try {
+        const { otp, email } = req.body;
+        if (!otp || !email) return handelResponse(res, 401, "Fill all the details")
+
+        TODO:
+        "call the model"
+        const response = await verifyOtpService(otp, email);
+        if(response.success === true) return handelResponse(res,200,"Otp Verified",response)
+        
+    } catch (error) {
+        next(error)
+    }
+}

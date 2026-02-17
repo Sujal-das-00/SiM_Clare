@@ -9,6 +9,16 @@
             "date": 1770963430621,
             "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/13-02-2026-app.log",
             "hash": "486e946cb14ea88a4ce492745470493984d1cb739eb7b8ac2ed991f2f1138b3a"
+        },
+        {
+            "date": 1771258624075,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/16-02-2026-app.log",
+            "hash": "a1e9151e17980942984609d9b9014c22992c0c2990d2a035f0322584a31ddbc0"
+        },
+        {
+            "date": 1771322782396,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/17-02-2026-app.log",
+            "hash": "7ba3a4f1932dda658dde784cb038ed6d2476990181a3f356ad0b563a6c819c62"
         }
     ],
     "hashType": "sha256"

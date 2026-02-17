@@ -1,11 +1,10 @@
-import { userSignupService } from "../models/model.userSignup.js";
+
+import { userSignupOrchestors } from "../Orchestors/Orchestrator.Signup.js";
 import { handelResponse } from "../utils/errorHandeler.js";
-import bcrypt from 'bcrypt'
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 export const userSignup = async (req, res, next) => {
     try {
-
         const { email, password, phone, name } = req.body;
         if (!email || !phone || !name || !password)
             return handelResponse(res, 404, "All fields are required");
@@ -27,13 +26,8 @@ export const userSignup = async (req, res, next) => {
         if (!phoneNumber || !phoneNumber.isValid() || phoneNumber.number !== phoneNumber.format('E.164')) {
             return handelResponse(res, 400, "Phone must be valid E.164 format");
         }
-
-        const saltRounds = 10;
-        const hashed_password = await bcrypt.hash(password, saltRounds);
-
-        // console.log("controller data ")
-        // console.log(phone," ",email," ",name," ",password)
-        const newUser = await userSignupService(email, hashed_password, phone, name)
+        const newUser = await userSignupOrchestors(req.body);
+        
         return handelResponse(res, 201, "User Created Successfully", newUser)
     } catch (error) {
         next(error)

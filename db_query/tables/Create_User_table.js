@@ -16,8 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
 
     email_verified BOOLEAN DEFAULT FALSE,
     phone_verified BOOLEAN DEFAULT FALSE,
-    otp_hash VARCHAR(255),
-    otp_expiry DATETIME;
     last_login_at TIMESTAMP NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
