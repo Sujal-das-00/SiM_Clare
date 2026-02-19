@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const production = process.env.NODE_ENV === "production";
+const production = false
 
 const pool = mysql.createPool({
     host: production ? process.env.DB_HOST : process.env.DEV_DB_HOST,
