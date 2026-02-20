@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import { userSignupService } from '../models/model.userSignup.js';
 import {generateAndSaveOtp} from '../services/otpGrenerator.js'
 import { sendMail } from '../services/mailer.js';
+import { handelResponse } from '../utils/errorHandeler.js';
 export const userSignupOrchestors = async (data) => {
     const { email, password, phone, name } = data;
     const hashed_password = await bcrypt.hash(password, 10);
@@ -12,6 +13,7 @@ export const userSignupOrchestors = async (data) => {
         //generate otp
         const otp = await generateAndSaveOtp(user_id,'EMAIL_VERIFICATION');
         const response = await sendMail(email,otp)
+        return(response)
     } catch (error) {
         throw error
     }
