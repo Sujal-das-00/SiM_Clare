@@ -11,7 +11,7 @@ export const transporter = nodemailer.createTransport({
     }, tls: {
         family: 4 
     }
-});
+}); 
 
 export const sendMail = async (to, otp) => {
     try {
