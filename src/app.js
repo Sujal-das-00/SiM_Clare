@@ -21,7 +21,8 @@ app.use('/api',router)
 //error handeler
 
 
-const frontendOrigin = 'http://localhost:3000'; 
+const frontendOrigin = ['http://localhost:3000','https://si-m-claire.vercel.app']; 
+
 const corsOptions = {
   origin: frontendOrigin,
   credentials: true, 
