@@ -10,25 +10,28 @@ import { errorhandler } from '../middlewares/error_handeler.js';
 const app = express();
 const PORT = process.env.PORT || 3000
 
-//middlewares
+const frontendOrigin = [
+  'http://localhost:3000',
+  'https://si-m-claire.vercel.app'
+]; 
+const corsOptions = {
+  origin: frontendOrigin,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
-// app.use(cors());
+
+//middlewares
 
 //routes
 app.use('/api',router)
 
 //error handeler
 
-
-const frontendOrigin = ['http://localhost:3000','https://si-m-claire.vercel.app']; 
-
-const corsOptions = {
-  origin: frontendOrigin,
-  credentials: true, 
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], 
-  optionsSuccessStatus: 200 
-};
 
 app.get('/',(req,res)=>{
     res.send(`<h1>server is running lawde</h1>`)
