@@ -3,7 +3,6 @@ import db from '../config/db.js'
 import AppError from "../utils/Apperror.js";
 import { sendMail } from "../services/mailer.js";
 export const userForgetPasswordOrchestrator = async (email) => {
-    console.log("email is",email)
     //search the mail in db 
     try {
         const [rows] = await db.query("Select * from users where email=?", [email])
@@ -13,9 +12,8 @@ export const userForgetPasswordOrchestrator = async (email) => {
         }
         const otp = await generateAndSaveOtp(rows[0].id,'PASSWORD_RESET');
         const response = await sendMail(email,otp)
-        return otp;
-        
-        
+        if(response)return ({sucess:true,otp:otp})
+        return ({sucess:false})
     } catch (error) {
         throw error
     }

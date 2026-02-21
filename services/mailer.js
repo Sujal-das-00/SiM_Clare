@@ -48,10 +48,12 @@ export const sendMail = async (email, otp) => {
                 timeout: 10000
             }
         );
-        console.log("OTP email sent successfully", {
-            email,
-            messageId: response.data
-        })
+        // console.log("OTP email sent successfully", {
+        //     email,
+        //     messageId: response.data
+        // })
+        console.log("OTP email sent successfully");
+        
         return response.data;
     } catch (error) {
 

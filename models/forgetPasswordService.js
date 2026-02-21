@@ -1,0 +1,15 @@
+import db from '../config/db.js'
+export const forgetPasswordService = async (email, pass) => {
+    try {
+        const [result] = await db.query(
+            'UPDATE users SET password_hash = ? WHERE email = ?',
+            [pass, email]
+        );
+        if (result.affectedRows === 0) {
+            return null; // user not found
+        }
+        return { success: true };
+    } catch (error) {
+        throw error;
+    }
+};

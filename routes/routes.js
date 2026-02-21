@@ -7,13 +7,16 @@ import limiter from '../middlewares/rateLimiter.js';
 import { resendOtp } from '../controllers/resendOtp.js';
 import { fetchDestination } from '../controllers/fetchDestination.js';
 import { getSimByDestination } from '../controllers/getSimByDestination.js';
+import { resetPassword } from '../controllers/forgetPassword.js';
 
 const router = express.Router();
 router.post('/login',limiter,userLogin);
 router.post('/signup',userSignup);
-router.post('/forgot/password',forgotPassword);
+router.post('/forgot/password-initiate',forgotPassword);
+router.post('/forget-password/verify',resetPassword)
 router.post('/verify/otp',verifyOtp)
 router.post('/resend/otp',resendOtp)
+
 
 router.get('/get/all-destination',fetchDestination)
 router.get('/get/sims',getSimByDestination)
