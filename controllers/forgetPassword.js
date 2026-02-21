@@ -6,13 +6,10 @@ import bcrypt from "bcrypt";
 
 export const resetPassword = async (req, res, next) => {
     try {
-        const { email, otp, newPass, confPass } = req.body;
+        const { email, otp, newPass } = req.body;
 
-        if (!email || !otp || !newPass || !confPass)
+        if (!email || !otp || !newPass)
             return handelResponse(res, 400, "All fields required");
-
-        if (newPass !== confPass)
-            return handelResponse(res, 400, "Passwords do not match");
 
         const passwordRegex =
             /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;

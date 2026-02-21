@@ -12,9 +12,10 @@ export const resendOtp = async (req,res,next)=>{
         if(!ismailExist) return handelResponse(res,404,"Email not found please do signup");
 
         const user_id = ismailExist.user_id;
+        const name = ismailExist.name;
         const otp = await generateAndSaveOtp(user_id,'EMAIL_VERIFICATION')
-        const response = await sendMail(email,otp);
-        return handelResponse(res,200,"otp sent succcessfully",response.envelope.to[0])
+        const response = await sendMail(name,email,otp);
+        return handelResponse(res,200,"otp sent succcessfully",response)
     } catch (error) {
         next(error)
     }

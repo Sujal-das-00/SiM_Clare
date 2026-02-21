@@ -9,20 +9,25 @@ import { errorhandler } from '../middlewares/error_handeler.js';
 // console.log(token);
 
 const app = express();
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+    origin: "*",
+    methods: "*",
+    allowedHeaders: "*"
+}));
 const PORT = process.env.PORT || 9000
 
-const frontendOrigin = [
-    'http://localhost:3000',
-    'https://www.simclaire.com',
-    'https://simclaire.com'
-];
-const corsOptions = {
-    origin: frontendOrigin,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    optionsSuccessStatus: 200
-};
+// const frontendOrigin = [
+//     'http://localhost:3000',
+//     'https://www.simclaire.com',
+//     'https://simclaire.com', '*'
+// ];
+// const corsOptions = {
+//     origin: frontendOrigin,
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//     optionsSuccessStatus: 200
+// };
 
 
 

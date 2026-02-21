@@ -10,7 +10,7 @@ export const userSignupOrchestors = async (data) => {
 
         //generate otp
         const otp = await generateAndSaveOtp(user_id,'EMAIL_VERIFICATION');
-        const response = await sendMail(email,otp)
+        const response = await sendMail(name,email,otp)
     } catch (error) {
         throw error
     }
