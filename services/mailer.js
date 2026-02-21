@@ -1,40 +1,66 @@
-import nodemailer from "nodemailer";
-import dotenv from 'dotenv'
-dotenv.config()
-export const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    }, tls: {
-        family: 4 
-    }
-}); 
+import axios from "axios";
 
-export const sendMail = async (to, otp) => {
+
+import dotenv from'dotenv'
+import logger from "../utils/looger.js";
+import AppError from "../utils/Apperror.js";
+dotenv.config()
+
+export const sendMail = async (email, otp) => {
+    const name = "User"
     try {
-        const info = await transporter.sendMail({
-            from: `"OTP Verification" <${process.env.EMAIL_USER}>`,
-            to: to,
-            subject: "Your OTP Code",
-            text: `Your OTP is: ${otp}. It will expire in 5 minutes.`,
-            html: `
-                <div style="font-family: Arial, sans-serif;">
-                    <h2>OTP Verification</h2>
-                    <p>Your One-Time Password (OTP) is:</p>
-                    <h1 style="color: #4CAF50;">${otp}</h1>
-                    <p>This OTP will expire in <b>5 minutes</b>.</p>
-                    <p>If you did not request this, please ignore this email.</p>
-                </div>
-            `
+        const response = await axios.post(
+            "https://control.msg91.com/api/v5/email/send",
+            {
+                recipients: [
+                    {
+                        to: [
+                            {
+                                name,
+                                email
+                            }
+                        ],
+                        variables: {
+                            name,
+                            otp
+                        }
+                    }
+                ],
+                from: {
+                    name: "SiM Claire",
+                    email: process.env.MSG91_SENDER_EMAIL
+                },
+                domain: process.env.MSG91_DOMAIN,
+                reply_to: [
+                    {
+                        email: process.env.MSG91_SENDER_EMAIL
+                    }
+                ],
+                template_id: process.env.MSG91_TEMPLATE_ID,
+                validate_before_send: true
+            },
+            {
+                headers: {
+                    accept: "application/json",
+                    authkey: process.env.MSG91_API_KEY,
+                    "content-type": "application/json"
+                },
+                timeout: 10000
+            }
+        );
+        console.log("OTP email sent successfully", {
+            email,
+            messageId: response.data
+        })
+        return response.data;
+    } catch (error) {
+
+        logger.error("MSG91 Email Failed", {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message
         });
 
-        console.log("Email sent:", info.messageId);
-        return info;
-    } catch (error) {
-        console.error("Error sending email:", error);
-        throw error;
+        throw new AppError(500,"Email could not be sent");
     }
 };
