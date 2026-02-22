@@ -24,7 +24,7 @@ export const verifyOtpService = async (otp, email) => {
              FROM user_otps
              WHERE user_id = ?
              AND is_used = 0
-             ORDER BY created_at DESC
+             ORDER BY id DESC
              LIMIT 1`,
             [user_id]
         );
