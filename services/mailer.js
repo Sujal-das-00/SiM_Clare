@@ -37,7 +37,7 @@ export const sendMail = async (name,email, otp) => {
                     }
                 ],
                 template_id: process.env.MSG91_TEMPLATE_ID,
-                validate_before_send: true
+                validate_before_send: false
             },
             {
                 headers: {
@@ -48,10 +48,10 @@ export const sendMail = async (name,email, otp) => {
                 timeout: 10000
             }
         );
-        // console.log("OTP email sent successfully", {
-        //     email,
-        //     messageId: response.data
-        // })
+        console.log("OTP email sent successfully", {
+            email,
+            messageId: response.data
+        })
         console.log("OTP email sent successfully");
         
         return ({success:true});
