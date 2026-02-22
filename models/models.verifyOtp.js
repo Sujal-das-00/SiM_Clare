@@ -7,7 +7,6 @@ export const verifyOtpService = async (otp, email) => {
     const connection = await db.getConnection();
 
     try {
-        
         const [rows] = await connection.query(
             "SELECT id, email_verified FROM users WHERE email = ?",
             [email]
@@ -18,18 +17,14 @@ export const verifyOtpService = async (otp, email) => {
 
         const user_id = rows[0].id;
         const email_verified = rows[0].email_verified;
-
-        await connection.query(`UPDATE user_otps
-        SET is_used = true
-        WHERE user_id = ? 
-        AND is_used = false;`,[user_id])
+            
 
         const [otpRows] = await connection.query(
             `SELECT id, otp_hash, expires_at, is_used
              FROM user_otps
              WHERE user_id = ?
              AND is_used = 0
-             ORDER BY id DESC
+             ORDER BY created_at DESC
              LIMIT 1`,
             [user_id]
         );
