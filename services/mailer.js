@@ -7,7 +7,6 @@ import AppError from "../utils/Apperror.js";
 dotenv.config()
 
 export const sendMail = async (name,email, otp) => {
-    console.log(name," ",email," ",otp)
     try { 
         const response = await axios.post(
             "https://control.msg91.com/api/v5/email/send",
@@ -48,10 +47,10 @@ export const sendMail = async (name,email, otp) => {
                 timeout: 10000
             }
         );
-        console.log("OTP email sent successfully", {
-            email,
-            messageId: response.data
-        })
+        // console.log("OTP email sent successfully", {
+        //     email,
+        //     messageId: response.data
+        // })
         console.log("OTP email sent successfully");
         
         return ({status:'success'});
