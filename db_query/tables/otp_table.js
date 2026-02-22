@@ -9,9 +9,9 @@ const password_resets = async () => {
     user_id BIGINT NOT NULL,
     otp_hash VARCHAR(255) NOT NULL,
     purpose ENUM('EMAIL_VERIFICATION', 'PASSWORD_RESET', 'PHONE_VERIFICATION') NOT NULL,
-    expires_at DATETIME NOT NULL,
+    expires_at DATETIME(3) NOT NULL,
     is_used BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)
     CONSTRAINT fk_user_otp
         FOREIGN KEY (user_id)
         REFERENCES users(id)

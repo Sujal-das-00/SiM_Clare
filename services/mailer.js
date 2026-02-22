@@ -54,7 +54,7 @@ export const sendMail = async (name,email, otp) => {
         })
         console.log("OTP email sent successfully");
         
-        return ({success:true});
+        return ({status:'success'});
     } catch (error) {
 
         logger.error("MSG91 Email Failed", {

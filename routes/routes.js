@@ -10,19 +10,19 @@ import { getSimByDestination } from '../controllers/getSimByDestination.js';
 import { resetPassword } from '../controllers/forgetPassword.js';
 
 const router = express.Router();
-router.post('/login',limiter(1*60*1000,10),userLogin);
-router.post('/signup',limiter(1*60*1000,5),userSignup);
-router.post('/forgot/password-initiate',limiter(2*1000,1),forgotPassword);
-router.post('/forget-password/verify',limiter(30*1000,1),resetPassword)
-router.post('/verify/otp',limiter(30*1000,1),verifyOtp)
-router.post('/resend/otp',limiter(2*1000,1),resendOtp)
+router.post('/login', limiter(15 * 60 * 1000, 10), userLogin);
+router.post('/signup', limiter(15 * 60 * 1000, 8), userSignup);
+router.post('/forgot/password-initiate', limiter(10 * 60 * 1000, 5), forgotPassword);
+router.post('/forget-password/verify', limiter(5 * 60 * 1000, 5), resetPassword)
+router.post('/verify/otp', limiter(5 * 60 * 1000, 5), verifyOtp)
+router.post('/resend/otp', limiter(10 * 60 * 1000, 5), resendOtp)
 
 
-router.get('/get/all-destination',fetchDestination)
-router.get('/get/sims',getSimByDestination)
+router.get('/get/all-destination', fetchDestination)
+router.get('/get/sims', getSimByDestination)
 
-router.get('/',(req,res)=>{
-    res.send(`<h1>Routes is running lawde</h1>`)                   
+router.get('/', (req, res) => {
+    res.send(`<h1>Routes is running lawde</h1>`)
 })
 
 export default router;

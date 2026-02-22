@@ -3,6 +3,8 @@ import db from '../config/db.js'
 import { createJwt } from '../services/Authentication._Client.js';
 import AppError from '../utils/Apperror.js';
 import { generateAndSaveOtp } from '../services/otpGrenerator.js';
+import { sendMail } from '../services/mailer.js';
+import { validateEmail } from '../utils/emailValidator.js';
 export const userLoginService = async (email, password) => {
     try {
         const query = `SELECT * FROM users WHERE email=?`;
@@ -15,14 +17,13 @@ export const userLoginService = async (email, password) => {
         if (!match) throw new AppError(401, "Invallid password")
 
         if (!user.email_verified) {
+            const checkEmail = await validateEmail(email);
+            if (!checkEmail.valid) throw new AppError(400, checkEmail.reason)
             const otp = await generateAndSaveOtp(user.id, "EMAIL_VERIFICATION");
-            TODO:
-            "sends otp"
+            const response = await sendMail(email, otp)
             return {
                 status: "UNVERIFIED_EMAIL",
                 message: "Email not verified. OTP sent.",
-                email: user.email,
-                otp: otp
             };
         }
 

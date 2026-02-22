@@ -5,7 +5,6 @@ import { userForgetPasswordOrchestrator } from '../Orchestors/Orchestrator.Forgo
 export const forgotPassword = async (req, res, next) => {
     try {
         const { email } = req.body
-        console.log(email)
         if(!email) return handelResponse(res,400,"Please provide the email") 
         //call the orchestor 
         const response = await userForgetPasswordOrchestrator(email)
