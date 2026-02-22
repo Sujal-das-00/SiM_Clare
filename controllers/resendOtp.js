@@ -8,9 +8,10 @@ import { handelResponse } from "../utils/errorHandeler.js";
 
 export const resendOtp = async (req,res,next)=>{
     try {
-         const checkEmail = await validateEmail(email);
-        if(!checkEmail.valid) throw new AppError(400,checkEmail.reason)
+         
         const {email} = req.body;
+        const checkEmail = await validateEmail(email);
+        if(!checkEmail.valid) throw new AppError(400,checkEmail.reason)
         if(!email) return handelResponse(res,404,"Please provide the email ")
         const ismailExist = await ismailExistService(email);
         if(!ismailExist) return handelResponse(res,404,"Email not found please do signup");
