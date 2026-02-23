@@ -16,7 +16,7 @@ export const userSignupOrchestors = async (data) => {
 
     const otp = await generateAndSaveOtp(user_id, 'EMAIL_VERIFICATION');
 
-    // await sendMail(name, email, otp)
+    await sendMail(name, email, otp)
 
     return ({ status: 'success' })
 }

@@ -1,14 +1,14 @@
 import axios from "axios";
 
 
-import dotenv from'dotenv'
+import dotenv from 'dotenv'
 import logger from "../utils/looger.js";
 import AppError from "../utils/Apperror.js";
 dotenv.config()
 
-export const sendMail = async (name,email, otp) => {
-    try { 
-        await axios.post(
+export const sendMail = async (name, email, otp) => {
+    try {
+        const response = await axios.post(
             "https://control.msg91.com/api/v5/email/send",
             {
                 recipients: [
@@ -47,13 +47,13 @@ export const sendMail = async (name,email, otp) => {
                 timeout: 10000
             }
         );
-        // console.log("OTP email sent successfully", {
-        //     email,
-        //     messageId: response.data
-        // })
+        console.log("OTP email sent successfully", {
+            email,
+            messageId: response.data
+        })
         console.log("OTP email sent successfully");
-        
-        return ({status:'success'});
+
+        return ({ status: 'success' });
     } catch (error) {
 
         logger.error("MSG91 Email Failed", {
@@ -62,6 +62,6 @@ export const sendMail = async (name,email, otp) => {
             message: error.message
         });
 
-        throw new AppError(500,"Email could not be sent");
+        throw new AppError(500, "Email could not be sent");
     }
 };

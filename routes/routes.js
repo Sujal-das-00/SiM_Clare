@@ -13,7 +13,7 @@ const router = express.Router();
 router.post('/login', limiter(15 * 60 * 1000, 10), userLogin);
 router.post('/signup', limiter(15 * 60 * 1000, 8), userSignup);
 router.post('/forgot/password-initiate', limiter(10 * 60 * 1000, 5), forgotPassword);
-router.post('/forget-password/verify', limiter(5 * 60 * 1000, 5), resetPassword)
+router.post('/forgot-password/verify', limiter(5 * 60 * 1000, 5), resetPassword)
 router.post('/verify/otp', limiter(5 * 60 * 1000, 5), verifyOtp)
 router.post('/resend/otp', limiter(10 * 60 * 1000, 5), resendOtp)
 
