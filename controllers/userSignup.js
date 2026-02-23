@@ -7,12 +7,14 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 export const userSignup = async (req, res, next) => {
     try {
         const { email, password, phone, name } = req.body;
+        console.log("Name length:", name.length);
         if (!email || !phone || !name || !password)
-            return handelResponse(res, 404, "All fields are required");
+            return handelResponse(res, 400, "All fields are required");
 
+        if (email.length>80 || phone.length>20 || name.length>50 || password.length>50)
+            return handelResponse(res, 400, "Fields are too long",'fail');
         const emailCheck = await validateEmail(email);
         if(!emailCheck.valid) return handelResponse(res,400,"Invalid Email Address")
-
 
         const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordRegex.test(password)) {

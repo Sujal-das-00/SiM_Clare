@@ -5,16 +5,19 @@ import AppError from '../utils/Apperror.js';
 import { generateAndSaveOtp } from '../services/otpGrenerator.js';
 import { sendMail } from '../services/mailer.js';
 import { validateEmail } from '../utils/emailValidator.js';
+const DUMMY_HASH = '$2b$12$6a6Zxa7/SmP2onKFsALnZemZ8qKLROavagKpy9cft7CEPHTpVEr.a';
 export const userLoginService = async (email, password) => {
     try {
+        
         const query = `SELECT * FROM users WHERE email=?`;
         const [rows] = await db.query(query, [email]);
         const user = rows[0];
-        if (rows.length === 0) {
-            throw new AppError("User not found")
+
+        const hashToCompare = user ? user.password_hash : DUMMY_HASH;
+        const match = await bcrypt.compare(password, hashToCompare);
+        if (!user || !match) {
+            throw new AppError(401, 'Invalid email or password');
         }
-        const match = await bcrypt.compare(password, user.password_hash);
-        if (!match) throw new AppError(401, "Invallid password")
 
         if (!user.email_verified) {
             const checkEmail = await validateEmail(email);
@@ -26,8 +29,6 @@ export const userLoginService = async (email, password) => {
                 message: "Email not verified. OTP sent.",
             };
         }
-
-
 
         const jwttoken = await createJwt(user)
         return (jwttoken);
