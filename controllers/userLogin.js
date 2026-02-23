@@ -5,7 +5,6 @@ import { userLoginService } from '../models/models.userLoginService.js';
 export const userLogin = async (req, res, next) => {
     try {
         const { email: rawEmail, password: rawPassword } = req.body;
-        console.log(rawEmail," ", rawPassword);
         if (typeof rawEmail !== 'string' || typeof rawPassword !== 'string') {
             return handelResponse(res, 400, 'Invalid input');
         }

@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import db from '../config/db.js'
 import router from '../routes/routes.js';
 import { errorhandler } from '../middlewares/error_handeler.js';
+import limiter from '../middlewares/rateLimiter.js';
 
 
 const app = express();
@@ -52,7 +53,7 @@ const PORT = process.env.PORT || 7000;
 app.get('/', (req, res) => {
     res.send(`<h1>server is running lawde</h1>`)
 })
-app.get("/health", async (req, res) => {
+app.get("/health",limiter(5*60*1000,6), async (req, res) => {
     try {
         await db.query("SELECT 1");
         res.status(200).json({
