@@ -21,18 +21,19 @@ export const userLogin = async (req, res, next) => {
         if (email.length > 254) {
             return handelResponse(res, 400, 'Invalid input');
         }
-
+        console.log("login service ")
         const user = await userLoginService(email, password)
+
         if (user.status === "UNVERIFIED_EMAIL") {
-            return res.status(200).json(user);
+            return res.status(400).json(user);
         }
         res.cookie('token', user, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             maxAge: 3600000,
         });
-        res.status(200).json({ status: "success", message: "user looged in successfuly", jwt: user })
+        res.status(200).json({ status: "success", message: "user looged in successfuly"})
     }
     catch (error) {
         next(error)

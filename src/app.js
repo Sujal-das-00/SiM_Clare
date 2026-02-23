@@ -10,26 +10,34 @@ const app = express();
 app.use(helmet());
 app.disable('x-powered-by');
 
-const frontendOrigin = [
-    'http://localhost:3000',
-    'https://www.simclaire.com',
-    'https://simclaire.com'
-];
+// const frontendOrigin = [
+//     'http://localhost:3000',
+//     'https://www.simclaire.com',
+//     'https://simclaire.com'
+// ];
 
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin || frontendOrigin.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         if (!origin || frontendOrigin.includes(origin)) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//     optionsSuccessStatus: 200
+// };
+
+// app.use(cors(corsOptions));
+app.use(cors({
+    origin: (origin, callback) => {
+        callback(null, true); // dynamically allow all origins
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 

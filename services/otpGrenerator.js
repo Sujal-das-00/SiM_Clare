@@ -13,7 +13,7 @@ import bcrypt from 'bcrypt'
  * @throws {Error} Throws database or hashing errors if operation fails.
  */
 
-export const generateAndSaveOtp = async (id, purpose) => {
+export const generateAndSaveOtp = async (id, purpose='EMAIL_VERIFICATION') => {
     const otp = crypto.randomInt(100000, 1000000).toString();
     const otpHash = await bcrypt.hash(otp,10);
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
