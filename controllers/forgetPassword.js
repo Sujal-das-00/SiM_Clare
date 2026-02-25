@@ -3,7 +3,7 @@ import { verifyOtpService } from "../models/models.verifyOtp.js";
 import AppError from "../utils/Apperror.js";
 import { handelResponse } from "../utils/errorHandeler.js";
 import bcrypt from "bcrypt";
-
+import zxcvbn from "zxcvbn";
 export const resetPassword = async (req, res, next) => {
     try {
         const { email, otp, newPass } = req.body;
@@ -11,15 +11,10 @@ export const resetPassword = async (req, res, next) => {
         if (!email || !otp || !newPass)
             return handelResponse(res, 400, "All fields required");
 
-        const passwordRegex =
-            /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-        if (!passwordRegex.test(newPass)) {
-            return handelResponse(
-                res,
-                400,
-                "Password must be at least 8 characters long and include 1 uppercase letter, 1 number, and 1 special character"
-            );
+        if (password.length < 8) return handelResponse(res, 400, "Password Mmust be 8 char long")
+        const SecurePassword = zxcvbn(password);
+        if (SecurePassword.score < 3) {
+            return handelResponse(res, 400, "Password is too weak. Please choose a stronger password")
         }
 
         await verifyOtpService(otp, email);
