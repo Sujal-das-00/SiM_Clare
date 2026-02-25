@@ -11,8 +11,8 @@ export const resetPassword = async (req, res, next) => {
         if (!email || !otp || !newPass)
             return handelResponse(res, 400, "All fields required");
 
-        if (password.length < 8) return handelResponse(res, 400, "Password Mmust be 8 char long")
-        const SecurePassword = zxcvbn(password);
+        if (newPass.length < 8) return handelResponse(res, 400, "Password Mmust be 8 char long")
+        const SecurePassword = zxcvbn(newPass);
         if (SecurePassword.score < 3) {
             return handelResponse(res, 400, "Password is too weak. Please choose a stronger password")
         }
