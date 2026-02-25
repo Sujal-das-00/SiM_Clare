@@ -49,6 +49,11 @@
             "date": 1771872815497,
             "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/24-02-2026-rejections.log",
             "hash": "442b29ea2914b312e89d80703d769154d7cb5a95c06c08784af88f47f5fe53f5"
+        },
+        {
+            "date": 1772012031254,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/25-02-2026-rejections.log",
+            "hash": "43d66dfc1534359e705cdca30ac35fb4bde7b9c56e5390efc950e2537f830921"
         }
     ],
     "hashType": "sha256"

@@ -4,7 +4,7 @@ import { handelResponse } from "../utils/errorHandeler.js";
 
 export const getSimByDestination = async (req, res, next) => {
     try {
-        const { destinationid } = req.query;
+        const { destinationid } = req.params;
         console.log("this is a query parameter ",destinationid)
         if (!destinationid) return handelResponse(res, 404, "Please select a country");
         const token = await GetAdminJwt();

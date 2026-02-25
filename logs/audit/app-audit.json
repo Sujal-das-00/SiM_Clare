@@ -49,6 +49,11 @@
             "date": 1771872815474,
             "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/24-02-2026-app.log",
             "hash": "6656504fc705935f39d42abb456052db7991c1c8d7bdd5e64dce7c22600efbcd"
+        },
+        {
+            "date": 1772012031235,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/25-02-2026-app.log",
+            "hash": "57517ea51da7b8f3917dfa83478d912c43c591f836253ef86d7f0577452439f4"
         }
     ],
     "hashType": "sha256"

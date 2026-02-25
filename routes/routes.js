@@ -19,7 +19,7 @@ router.post('/auth/otp/resend', limiter(10 * 60 * 1000, 5), resendOtp)
 
 
 router.get('/get/all-destination', fetchDestination)
-router.get('/get/sims', getSimByDestination)
+router.get('/get/sims/:destinationid', getSimByDestination)
 
 router.get('/', (req, res) => {
     res.send(`<h1>Routes is running lawde</h1>`)

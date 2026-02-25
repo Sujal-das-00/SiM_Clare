@@ -3,6 +3,7 @@ import { userSignupOrchestors } from "../Orchestors/Orchestrator.Signup.js";
 import { validateEmail } from "../utils/emailValidator.js";
 import { handelResponse } from "../utils/errorHandeler.js";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import zxcvbn from "zxcvbn";
 
 export const userSignup = async (req, res, next) => {
     try {
@@ -11,18 +12,14 @@ export const userSignup = async (req, res, next) => {
         if (!email || !phone || !name || !password)
             return handelResponse(res, 400, "All fields are required");
 
-        if (email.length>80 || phone.length>20 || name.length>50 || password.length>50)
-            return handelResponse(res, 400, "Fields are too long",'fail');
+        if (email.length > 80 || phone.length > 20 || name.length > 50 || password.length > 80)
+            return handelResponse(res, 400, "Fields are too long", 'fail');
         const emailCheck = await validateEmail(email);
-        if(!emailCheck.valid) return handelResponse(res,400,"Invalid Email Address")
-
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(password)) {
-            return handelResponse(
-                res,
-                400,
-                "Password must be at least 8 characters long and include 1 uppercase letter, 1 number, and 1 special character"
-            );
+        if (!emailCheck.valid) return handelResponse(res, 400, "Invalid Email Address")
+        if(password.length<8) return handelResponse(res,400,"Password Mmust be 8 char long")
+        const SecurePassword = zxcvbn(password);
+        if (SecurePassword.score < 3) {
+            return handelResponse(res,400,"Password is too weak. Please choose a stronger password")
         }
         const phoneNumber = parsePhoneNumberFromString(phone);
         if (!phoneNumber || !phoneNumber.isValid() || phoneNumber.number !== phoneNumber.format('E.164')) {
