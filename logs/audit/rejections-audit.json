@@ -6,11 +6,6 @@
     "auditLog": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/audit/rejections-audit.json",
     "files": [
         {
-            "date": 1770963430633,
-            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/13-02-2026-rejections.log",
-            "hash": "e6de92e4a754075336a0c828927dc72684e6ad17bd90f3e4016284d93b2588ce"
-        },
-        {
             "date": 1771258624094,
             "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/16-02-2026-rejections.log",
             "hash": "28dd64a2ed31b7a49a68f6acea7d5dfada550dcfb28a5f14fd6f20b094891a21"
@@ -54,6 +49,21 @@
             "date": 1772012031254,
             "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/25-02-2026-rejections.log",
             "hash": "43d66dfc1534359e705cdca30ac35fb4bde7b9c56e5390efc950e2537f830921"
+        },
+        {
+            "date": 1772102455330,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/26-02-2026-rejections.log",
+            "hash": "a20dd445a57940e58efb98a3e204fd50ead7b488d82755ef618aca86e80a8f61"
+        },
+        {
+            "date": 1772188508045,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/27-02-2026-rejections.log",
+            "hash": "071866e37057fd18abdee6b0eed673e475c246f0383d74561ad214537ef7add6"
+        },
+        {
+            "date": 1772217340648,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/rejections/28-02-2026-rejections.log",
+            "hash": "d31687444540b686288be43359b30e9dfa4c4090c67da04ef8af84e33a0b9d9c"
         }
     ],
     "hashType": "sha256"

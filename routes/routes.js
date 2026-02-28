@@ -8,6 +8,7 @@ import { resendOtp } from '../controllers/resendOtp.js';
 import { fetchDestination } from '../controllers/fetchDestination.js';
 import { getSimByDestination } from '../controllers/getSimByDestination.js';
 import { resetPassword } from '../controllers/forgetPassword.js';
+import { checkDeviceCompatibility } from '../controllers/controllers.deviceCompatablity.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
@@ -16,7 +17,7 @@ router.post('/auth/password/forgot/otp', limiter(10 * 60 * 1000, 5), requestOtp)
 router.post('/auth/password/reset', limiter(5 * 60 * 1000, 5), resetPassword)
 router.post('/auth/otp/verify', limiter(5 * 60 * 1000, 5), verifyOtp)
 router.post('/auth/otp/resend', limiter(10 * 60 * 1000, 5), resendOtp)
-
+router.post("/device/check-compatibility",checkDeviceCompatibility);
 
 router.get('/get/all-destination', fetchDestination)
 router.get('/get/sims/:destinationid', getSimByDestination)

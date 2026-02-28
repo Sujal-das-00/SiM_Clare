@@ -7,10 +7,23 @@ let cachedToken = null;
 let tokenExpiry = null;
 let cachedEnv = null;
 const GetAdminJwt = async () => {
+    const currentEnv = process.env.NODE_ENV === "production"
+        ? "production"
+        : "development";
+    const baseURL =
+        currentEnv === "production"
+            ? process.env.PROD_URL
+            : process.env.UAT_URL;
+
+    const password =
+        currentEnv === "production"
+            ? process.env.PROD_PASSWORD
+            : process.env.UAT_PASSWORD;
+
+    // console.log("Enviroment is ", currentEnv)
+    // console.log("url",process.env.PROD_URL+'esim/authenticate')
+    // console.log("password",process.env.PROD_PASSWORD)
     try {
-        const currentEnv = process.env.NODE_ENV === "production"
-            ? "production"
-            : "development";
 
         if (cachedEnv && cachedEnv !== currentEnv) {
             cachedToken = null;
@@ -21,15 +34,7 @@ const GetAdminJwt = async () => {
             return cachedToken;
         }
 
-        const baseURL =
-            currentEnv === "production"
-                ? process.env.PROD_URL
-                : process.env.UAT_URL;
 
-        const password =
-            currentEnv === "production"
-                ? process.env.PROD_PASSWORD
-                : process.env.UAT_PASSWORD;
 
         const response = await axios.post(
             `${baseURL}esim/authenticate`,
@@ -50,7 +55,7 @@ const GetAdminJwt = async () => {
 
         cachedToken = response.data.token;
         tokenExpiry = Date.now() + (15 * 60 * 1000);
-        console.log("Enviroment is : ",currentEnv)
+        console.log("Enviroment is : ", currentEnv)
         return cachedToken;
 
     } catch (error) {
@@ -58,4 +63,6 @@ const GetAdminJwt = async () => {
         throw error;
     }
 };
+
+
 export default GetAdminJwt;

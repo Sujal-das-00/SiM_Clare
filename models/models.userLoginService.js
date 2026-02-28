@@ -11,6 +11,7 @@ export const userLoginService = async (email, password) => {
         const query = `SELECT * FROM users WHERE email=?`;
         const [rows] = await db.query(query, [email]);
         const user = rows[0];
+        if(rows.length===0) throw new AppError(404,"Email not found")
 
         console.log(user.email_verified)
         if (!user.email_verified) {
