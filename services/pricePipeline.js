@@ -45,9 +45,6 @@ export async function pricingPipeline(plans, displayCurrency) {
         enrichWithMultiplier(plans),
         getExchangeRates(),
     ]);
-    console.log(enrichedPlans)
-    console.log(rates)
-
     return enrichedPlans.map(plan => {
         const finalPrice = convertPrice(plan.finalPriceCAD, displayCurrency, rates);
         const priceCAD = parseFloat(plan.finalPriceCAD.toFixed(4));

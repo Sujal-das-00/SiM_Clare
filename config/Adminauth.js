@@ -55,7 +55,6 @@ const GetAdminJwt = async () => {
 
         cachedToken = response.data.token;
         tokenExpiry = Date.now() + (15 * 60 * 1000);
-        console.log("Enviroment is : ", currentEnv)
         return cachedToken;
 
     } catch (error) {

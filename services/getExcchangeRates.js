@@ -80,7 +80,6 @@ async function writeToCache(rates) {
         throw new Error(`Cache write failed for ${failures.length} key(s)`);
     }
 
-    console.log(`[FX] Cached ${meta.totalRates} rates (base: CAD)`);
 }
 
 /**

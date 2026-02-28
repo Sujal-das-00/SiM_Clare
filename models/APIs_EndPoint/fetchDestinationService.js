@@ -4,7 +4,7 @@ import logger from "../../utils/looger.js";
 export const fetchDestinationService = async (token) => {
     try {
         const isDev = process.env.NODE_ENV !== "production";
-        console.log("Enviroment is",isDev);
+        // console.log("Enviroment is",isDev);
         const baseURL = isDev
             ? process.env.UAT_URL
             : process.env.PROD_URL;
@@ -17,7 +17,6 @@ export const fetchDestinationService = async (token) => {
             }
         }
         )
-        console.log(response.data)
         return response.data
     } catch (error) {
         logger.error(error)

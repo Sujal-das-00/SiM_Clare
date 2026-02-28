@@ -16,15 +16,11 @@ import logger from "../utils/looger.js";
 export const getSimByDestinationOrchestrator = async (destinationId, countryCode) => {
     try {
         const displayCurrency = getCurrencyForCountry(countryCode);
-        console.log("display country ",displayCurrency);
-        console.log(`[Orchestrator] destination=${destinationId} | countryCode=${countryCode} | currency=${displayCurrency}`);
         const plans = await getSimListFromRedis(destinationId)
         if (!plans || plans.length === 0) {
             throw new AppError(404, `No plans found for destination: ${destinationId}`);
         }
-        console.log(`[Orchestrator] Fetched ${plans.sims.length} plans for ${destinationId}`);
         const pricedPlans = await pricingPipeline(plans.sims, displayCurrency);
-        console.log(pricedPlans)
         return (pricedPlans)
     } catch (error) {
         logger.log(`[Orchestrator] Failed for destination="${destinationId}":`, error.message)

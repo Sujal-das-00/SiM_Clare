@@ -62,7 +62,6 @@ async function revalidateCache(country, k) {
     }
 
     await writeToCache(k, featuredPlans, products.length);
-    console.log(`[Cache] Revalidated "${country}" — ${featuredPlans.length} plans stored`);
     return featuredPlans;
 }
 
@@ -83,12 +82,10 @@ export async function fetchSimDetailsAndCache(country) {
     const lockAcquired = await acquireLock(k.lock);
 
     if (!lockAcquired) {
-        console.log(`[Cache] Lock active for "${normalized}", waiting...`);
         for (let i = 0; i < LOCK_RETRY_ATTEMPTS; i++) {
             await sleep(LOCK_RETRY_INTERVAL_MS);
             const retry = await redisClient.get(k.featured);
             if (retry) {
-                console.log(`[Cache] Got "${normalized}" after ${i + 1} retry(s)`);
                 return JSON.parse(retry);
             }
         }

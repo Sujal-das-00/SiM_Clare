@@ -8,7 +8,6 @@ import zxcvbn from "zxcvbn";
 export const userSignup = async (req, res, next) => {
     try {
         const { email, password, phone, name } = req.body;
-        console.log("Name length:", name.length);
         if (!email || !phone || !name || !password)
             return handelResponse(res, 400, "All fields are required");
 

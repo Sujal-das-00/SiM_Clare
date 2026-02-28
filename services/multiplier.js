@@ -15,7 +15,6 @@ const MULTIPLIER_QUERY = `
  */
 async function fetchMultiplierMap() {
     const  [rows]  = await db.query(MULTIPLIER_QUERY);
-    console.log(rows)   
     if (!rows || rows.length === 0) {
         throw new Error("[Multiplier] sim_pricing table is empty or all rows are inactive");
     }

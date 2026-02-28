@@ -34,7 +34,9 @@ const DEFAULT_CURRENCY = "USD";
  * @param {string} countryCode - e.g. "IN", "US", "GB"
  * @returns {string} e.g. "INR", "USD", "GBP"
  */
+
 export function getCurrencyForCountry(countryCode) {
     if (!countryCode || typeof countryCode !== "string") return DEFAULT_CURRENCY;
     return COUNTRY_TO_CURRENCY[countryCode.trim().toUpperCase()] ?? DEFAULT_CURRENCY;
 }
+

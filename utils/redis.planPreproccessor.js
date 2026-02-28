@@ -195,18 +195,11 @@ export function curatePlans(products) {
     const uniqueDays = [
         ...new Set(validProducts.map(p => p.productValidityDays))
     ].sort((a, b) => a - b);
-
-    console.log(`[Curator] Total raw plans     : ${products.length}`);
-    console.log(`[Curator] Valid plans          : ${validProducts.length}`);
-    console.log(`[Curator] Unique validity days : ${uniqueDays.join(", ")}`);
-
     const result = [];
 
     for (const day of uniqueDays) {
         const plansForDay = validProducts.filter(p => p.productValidityDays === day);
         const dayPlans = curatePlansForDay(plansForDay);
-
-        console.log(`[Curator] Day ${String(day).padStart(2, " ")} → ${dayPlans.length} plans selected (from ${plansForDay.length} candidates)`);
 
         result.push(...dayPlans);
     }
@@ -216,11 +209,6 @@ export function curatePlans(products) {
         acc[p.tierLabel] = (acc[p.tierLabel] || 0) + 1;
         return acc;
     }, {});
-
-    console.log(`[Curator] ─────────────────────────────────`);
-    console.log(`[Curator] Total curated plans  : ${result.length}`);
-    console.log(`[Curator] Tier breakdown       :`, breakdown);
-    console.log(`[Curator] ─────────────────────────────────`);
 
     return result;
 }

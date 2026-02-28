@@ -7,7 +7,6 @@ export async function getSimListFromRedis(destinationId) {
 
     // 1️⃣ Try Redis first
     const cachedData = await redisClient.get(cacheKey);
-    // console.log("sim cahed data is ",cachedData);
     
     if (cachedData) {
         const parsed = cachedData

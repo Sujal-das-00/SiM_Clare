@@ -20,7 +20,6 @@ export const userLogin = async (req, res, next) => {
         if (email.length > 254) {
             return handelResponse(res, 400, 'Invalid input');
         }
-        console.log("login service ")
         const user = await userLoginService(email, password)
 
         if (user.status === "UNVERIFIED_EMAIL") {
