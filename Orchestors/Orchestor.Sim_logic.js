@@ -14,14 +14,20 @@ import logger from "../utils/looger.js";
  */
 
 export const getSimByDestinationOrchestrator = async (destinationId, countryCode) => {
+    console.log("getting currency...",destinationId," country code ",countryCode)
     try {
         const displayCurrency = getCurrencyForCountry(countryCode);
+        console.log("going to redis... countrycode",countryCode)
         const plans = await getSimListFromRedis(destinationId)
         if (!plans || plans.length === 0) {
             throw new AppError(404, `No plans found for destination: ${destinationId}`);
         }
-        const pricedPlans = await pricingPipeline(plans.sims, displayCurrency);
+        console.log("going to pricingPipeline... display currency",displayCurrency)
+        const pricedPlans = await pricingPipeline(plans.sims, displayCurrency,destinationId);
+        console.log("returing plans")
         return (pricedPlans)
+
+
     } catch (error) {
         logger.log(`[Orchestrator] Failed for destination="${destinationId}":`, error.message)
         throw error

@@ -13,7 +13,7 @@ export const deviceCompatibilityFlow = async ({ userAgent, country }) => {
     const model = parsed.model;
     const os = parsed.os;
     const osVersion = parseFloat(parsed.osVersion);
-
+    console.log(model)
     if (!model) {
         return {
             compatible: null,

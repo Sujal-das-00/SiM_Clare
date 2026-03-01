@@ -29,20 +29,20 @@ function convertPrice(priceCAD, targetCurrency, rates) {
  *
  * @param {Array}  plans           - Curated plans from Redis cache
  * @param {string} displayCurrency - ISO 4217 code e.g. "INR", "USD"
+ * @param {string} destinationid -country code of the selected destination e.g. "USA-1", "IN-"
  * @returns {Promise<Array>}
  */
-export async function pricingPipeline(plans, displayCurrency) {
+export async function pricingPipeline(plans, displayCurrency,destinationid) {
 
     if (!Array.isArray(plans) || plans.length === 0) return [];
     if (!displayCurrency || typeof displayCurrency !== "string") {
-        console.warn("[Pricing] Invalid displayCurrency, falling back to CAD");
         displayCurrency = PROVIDER_CURRENCY;
     }
 
 
     // Run in parallel — independent operations
     const [enrichedPlans, rates] = await Promise.all([
-        enrichWithMultiplier(plans),
+        enrichWithMultiplier(plans,destinationid),
         getExchangeRates(),
     ]);
     return enrichedPlans.map(plan => {

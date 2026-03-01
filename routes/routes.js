@@ -9,6 +9,9 @@ import { fetchDestination } from '../controllers/fetchDestination.js';
 import { getSimByDestination } from '../controllers/getSimByDestination.js';
 import { resetPassword } from '../controllers/forgetPassword.js';
 import { checkDeviceCompatibility } from '../controllers/controllers.deviceCompatablity.js';
+import { updateSimMultiplier } from '../controllers/Admin_controllers/admin.controllers.simMultiplier.js';
+import { getMultiplierData } from '../controllers/Admin_controllers/admin.controllers.getMultiplierData.js';
+import { deleteSimMultiplier } from '../controllers/Admin_controllers/admin.controllers.deleteMultiplier.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
@@ -21,6 +24,14 @@ router.post("/device/check-compatibility",checkDeviceCompatibility);
 
 router.get('/get/all-destination', fetchDestination)
 router.get('/get/sims/:destinationid', getSimByDestination)
+
+//admin
+router.post('/admin/update/sim-multiplier',updateSimMultiplier)
+router.post('/admin/delete/sim-multiplier',deleteSimMultiplier)
+
+router.get('/admin/get/sim-multiplier',getMultiplierData)
+
+
 
 router.get('/', (req, res) => {
     res.send(`<h1>Routes is running lawde</h1>`)
