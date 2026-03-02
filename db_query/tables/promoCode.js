@@ -33,7 +33,8 @@ async function promocodeTable() {
 );`;
         await db.query(promocode);
         await db.query(promocodeController)
+        console.log("tables created successfully")
     } catch (error) {
 
     }
-}
+}promocodeTable()

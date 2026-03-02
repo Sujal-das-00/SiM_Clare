@@ -12,6 +12,8 @@ import { checkDeviceCompatibility } from '../controllers/controllers.deviceCompa
 import { updateSimMultiplier } from '../controllers/Admin_controllers/admin.controllers.simMultiplier.js';
 import { getMultiplierData } from '../controllers/Admin_controllers/admin.controllers.getMultiplierData.js';
 import { deleteSimMultiplier } from '../controllers/Admin_controllers/admin.controllers.deleteMultiplier.js';
+import { createPromoCode } from '../controllers/controller.promoCode.js';
+import { getAllPromoCodes } from '../controllers/Admin_controllers/controller.getPromoCode.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
@@ -31,7 +33,10 @@ router.post('/admin/delete/sim-multiplier',deleteSimMultiplier)
 
 router.get('/admin/get/sim-multiplier',getMultiplierData)
 
-
+router.post('/admin/promocode',createPromoCode)
+router.get('/admin/promocode',getAllPromoCodes)
+// router.delete('/admin/promocode')
+// router.patch('/admin/promocode')
 
 router.get('/', (req, res) => {
     res.send(`<h1>Routes is running lawde</h1>`)

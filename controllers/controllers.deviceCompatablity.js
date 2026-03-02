@@ -5,7 +5,7 @@ import { handelResponse } from "../utils/errorHandeler.js";
 export const checkDeviceCompatibility = async (req, res, next) => {
     try {
         const { userAgent, country="US" } = req.body;
-        console.log(userAgent,country)
+        console.log("user agent is: ",userAgent,country)
         if (!userAgent) {
             return next(new AppError(400,"User agent is required"));
         }
@@ -14,7 +14,7 @@ export const checkDeviceCompatibility = async (req, res, next) => {
             userAgent,
             country
         });
-
+        console.log("result is ",result)
         return handelResponse(
             res,
             200,
