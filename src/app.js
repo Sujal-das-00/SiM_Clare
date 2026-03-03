@@ -5,7 +5,7 @@ import db from '../config/db.js'
 import router from '../routes/routes.js';
 import { errorhandler } from '../middlewares/error_handeler.js';
 import limiter from '../middlewares/rateLimiter.js';
-
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(helmet());
@@ -44,6 +44,8 @@ app.use(express.json());
 
 //middlewares
 
+
+app.use(cookieParser());
 //routes
 app.use('/api', router)
 

@@ -18,7 +18,6 @@ export const getAllPromoCodes = async (req ,res , next)=>{
     is_first_order_only,
     country_code,
     sim_type,
-    is_active,
     CASE
         WHEN valid_until IS NOT NULL AND valid_until < NOW() THEN 'expired'
         WHEN valid_from  IS NOT NULL AND valid_from  > NOW() THEN 'upcoming'
@@ -26,7 +25,8 @@ export const getAllPromoCodes = async (req ,res , next)=>{
     END AS status,
     created_at
 FROM promo_codes
-ORDER BY created_at DESC; `;
+WHERE is_active = 1
+ORDER BY created_at DESC;  `;
 const [rows] = await db.query(query)
 return handelResponse(res,200,"Promocode fetched Successfully",rows)
     } catch (error) {

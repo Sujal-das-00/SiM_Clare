@@ -14,6 +14,9 @@ import { getMultiplierData } from '../controllers/Admin_controllers/admin.contro
 import { deleteSimMultiplier } from '../controllers/Admin_controllers/admin.controllers.deleteMultiplier.js';
 import { createPromoCode } from '../controllers/controller.promoCode.js';
 import { getAllPromoCodes } from '../controllers/Admin_controllers/controller.getPromoCode.js';
+import { deletePromoCode } from '../controllers/Admin_controllers/admin.controller.deletePromoCode.js';
+import { validatePromoCode } from '../controllers/controllers.promoCodeValidator.js';
+import { authenticateUser } from '../middlewares/clientAuth.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
@@ -23,6 +26,7 @@ router.post('/auth/password/reset', limiter(5 * 60 * 1000, 5), resetPassword)
 router.post('/auth/otp/verify', limiter(5 * 60 * 1000, 5), verifyOtp)
 router.post('/auth/otp/resend', limiter(10 * 60 * 1000, 5), resendOtp)
 router.post("/device/check-compatibility",checkDeviceCompatibility);
+router.post('/validate/promocode',authenticateUser,validatePromoCode)
 
 router.get('/get/all-destination', fetchDestination)
 router.get('/get/sims/:destinationid', getSimByDestination)
@@ -35,8 +39,7 @@ router.get('/admin/get/sim-multiplier',getMultiplierData)
 
 router.post('/admin/promocode',createPromoCode)
 router.get('/admin/promocode',getAllPromoCodes)
-// router.delete('/admin/promocode')
-// router.patch('/admin/promocode')
+router.delete('/admin/promocode/:id',deletePromoCode)
 
 router.get('/', (req, res) => {
     res.send(`<h1>Routes is running lawde</h1>`)
