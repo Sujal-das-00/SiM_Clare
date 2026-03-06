@@ -102,7 +102,8 @@ function stripToMinimal(plan, tierLabel, category) {
         tierLabel,  
         category,
         local: plan.local === "true",
-        localCountry:plan.localCountry
+        localCountry:plan.localCountry,
+        supportedCountries: plan.destinations
     };
 }
 

@@ -49,17 +49,20 @@ async function fetchMultiplierMap(destinationid) {
  * @param {string} destinationid (e.g. "JPN-1")
  * @returns {Promise<Array>}
  */
-export async function enrichWithMultiplier(plans, destinationid) {
+export async function enrichWithMultiplier(jsonplans, destinationid) {
+
+    const plans = Array.isArray(jsonplans)
+        ? jsonplans
+        : jsonplans?.id
+            ? [jsonplans]
+            : Object.values(jsonplans || {});
 
     if (!Array.isArray(plans) || plans.length === 0) return [];
 
     if (!destinationid)
         throw new Error("[Multiplier] countryCode is required for pricing resolution");
-
     const normalizedCountry = destinationid.toUpperCase();
-
     const multiplierMap = await fetchMultiplierMap(normalizedCountry);
-
     return plans.map(plan => {
 
         const typeKey = String(plan.type);
@@ -70,11 +73,11 @@ export async function enrichWithMultiplier(plans, destinationid) {
         const appliedMultiplier =
             typeMultipliers[normalizedCountry] ??
             typeMultipliers["GLOBAL"] ??
-            1.0;
+            5;
 
         if (!typeMultipliers[normalizedCountry] && !typeMultipliers["GLOBAL"]) {
             console.warn(
-                `[Multiplier] No multiplier found for sim_type "${plan.type}". Defaulting to 1.0`
+                `[Multiplier] No multiplier found for sim_type "${plan.type}". Defaulting to 5.0`
             );
         }
 

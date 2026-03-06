@@ -1,7 +1,6 @@
 import db from "../config/db.js";
 import AppError from "../utils/Apperror.js";
 export async function validatePromoService({ code, order_amount, country_code, sim_type, user_id }) {
-
     // ── 1. Fetch promo by code ────────────────────────────────────
     const [[promo]] = await db.query(
         `SELECT * FROM promo_codes WHERE code = ?`,
@@ -9,28 +8,28 @@ export async function validatePromoService({ code, order_amount, country_code, s
     );
 
     if (!promo) {
-        throw new AppError("Invalid promo code.", 404);
+        throw new AppError(404,"Invalid promo code.");
     }
 
     // ── 2. Active check ───────────────────────────────────────────
     if (!promo.is_active) {
-        throw new AppError("Invalid promo code.", 400);
+        throw new AppError(400,"Invalid promo code.");
     }
 
     // ── 3. Date validity ──────────────────────────────────────────
     const now = new Date();
 
     if (promo.valid_from && new Date(promo.valid_from) > now) {
-        throw new AppError("This promo code is not yet active.", 400);
+        throw new AppError(400,"This promo code is not yet active.");
     }
 
     if (promo.valid_until && new Date(promo.valid_until) < now) {
-        throw new AppError("This promo code has expired.", 400);
+        throw new AppError(400,"This promo code has expired.");
     }
 
     // ── 4. Global usage limit ─────────────────────────────────────
     if (promo.usage_limit !== null && promo.used_count >= promo.usage_limit) {
-        throw new AppError("This promo code has reached its usage limit.", 400);
+        throw new AppError(400,"This promo code has reached its usage limit.");
     }
 
     // ── 5. Per-user usage limit ───────────────────────────────────
@@ -42,7 +41,7 @@ export async function validatePromoService({ code, order_amount, country_code, s
     );
 
     if (user_redemption_count >= promo.user_usage_limit) {
-        throw new AppError("You have already used this promo code.", 400);
+        throw new AppError(400,"You have already used this promo code.");
     }
 
     // ── 6. First order only ───────────────────────────────────────
@@ -53,26 +52,27 @@ export async function validatePromoService({ code, order_amount, country_code, s
         );
 
         if (order_count > 0) {
-            throw new AppError("This promo code is only valid on your first order.", 400);
+            throw new AppError(400,"This promo code is only valid on your first order.");
         }
     }
 
     // ── 7. Minimum order amount ───────────────────────────────────
     if (promo.min_order_amount && Number(order_amount) < Number(promo.min_order_amount)) {
         throw new AppError(
-            `Minimum order amount of ${promo.min_order_amount} is required for this promo code.`,
-            400
+            400,
+            `Minimum order amount of ${promo.min_order_amount} is required for this promo code.`
+            
         );
     }
 
     // ── 8. Country restriction ────────────────────────────────────
     if (promo.country_code && promo.country_code !== country_code) {
-        throw new AppError("This promo code is not valid in your region.", 400);
+        throw new AppError(400,"This promo code is not valid in your region.");
     }
 
     // ── 9. SIM type restriction ───────────────────────────────────
     if (promo.sim_type !== null && Number(promo.sim_type) !== Number(sim_type)) {
-        throw new AppError("This promo code is not valid for this SIM type.", 400);
+        throw new AppError(400,"This promo code is not valid for this SIM type.");
     }
 
     // ── 10. Calculate discount ────────────────────────────────────

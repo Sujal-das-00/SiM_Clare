@@ -15,7 +15,7 @@ export const authenticateUser = (req, res, next) => {
 
         // Attach safe user info to request object
         req.user = {
-            id: decoded.userId,
+            id: decoded.id,
             email: decoded.email
         };
 

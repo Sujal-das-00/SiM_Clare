@@ -17,8 +17,8 @@ export const updateSimMultiplier = async (req, res, next) => {
         if (isNaN(numericMultiplier) || numericMultiplier <= 0)
             return next(new AppError(400,"multiplier must be > 0"));
 
-        if (numericMultiplier > 10)
-            return next(new AppError(400,"multiplier cannot exceed 10"));
+        if (numericMultiplier > 600)
+            return next(new AppError(400,"multiplier cannot exceed 600"));
 
         // FRONTEND must send GLOBAL or country code
         const normalizedCountry = country_code

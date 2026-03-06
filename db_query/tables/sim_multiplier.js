@@ -17,7 +17,7 @@ const createSimPriceMultiplierTable = async () => {
         ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT multiplier_positive CHECK (multiplier > 0),
-    CONSTRAINT multiplier_reasonable CHECK (multiplier <= 20),
+    CONSTRAINT multiplier_reasonable CHECK (multiplier <= 600),
 
     CONSTRAINT unique_sim_country UNIQUE (sim_type, country_code)
 );
