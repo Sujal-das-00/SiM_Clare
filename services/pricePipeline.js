@@ -1,4 +1,5 @@
 // services/pricingPipeline.js
+import { getRatesCached } from "./exchangeRatesInMemoryCache.js";
 import { getExchangeRates } from "./getExcchangeRates.js";
 import { enrichWithMultiplier } from "./multiplier.js";
 
@@ -8,19 +9,22 @@ const PROVIDER_CURRENCY = "CAD";
  * Converts a CAD price to the target display currency.
  * Falls back to CAD if rate is unavailable.
  */
-function convertPrice(priceCAD, targetCurrency, rates) {
+export function convertCurrency(priceCAD, targetCurrency, rates) {
+
     if (targetCurrency === PROVIDER_CURRENCY) {
-        return parseFloat(priceCAD.toFixed(2));
+        return priceCAD;
     }
 
     const rate = rates[targetCurrency];
 
-    if (!rate || typeof rate !== "number") {
-        console.warn(`[Pricing] No rate for "${targetCurrency}", falling back to CAD`);
-        return parseFloat(priceCAD.toFixed(2));
+    if (!rate || typeof rate !== "number" || rate <= 0) {
+        throw new Error(`FX rate missing for ${targetCurrency}`);
     }
-
-    return parseFloat((priceCAD * rate).toFixed(2));
+    return priceCAD * rate;
+}
+function convertPriceDisplay(priceCAD, targetCurrency, rates) {
+    const converted = convertCurrency(priceCAD, targetCurrency, rates);
+    return Number(converted.toFixed(2));
 }
 
 /**
@@ -32,7 +36,7 @@ function convertPrice(priceCAD, targetCurrency, rates) {
  * @param {string} destinationid -country code of the selected destination e.g. "USA-1", "IN-"
  * @returns {Promise<Array>}
  */
-export async function pricingPipeline(plans, displayCurrency,destinationid) {
+export async function pricingPipeline(plans, displayCurrency, destinationid) {
 
     if (!Array.isArray(plans) || plans.length === 0) return [];
     if (!displayCurrency || typeof displayCurrency !== "string") {
@@ -42,11 +46,12 @@ export async function pricingPipeline(plans, displayCurrency,destinationid) {
 
     // Run in parallel — independent operations
     const [enrichedPlans, rates] = await Promise.all([
-        enrichWithMultiplier(plans,destinationid),
-        getExchangeRates(),
+        enrichWithMultiplier(plans, destinationid),
+        getRatesCached(),
     ]);
     return enrichedPlans.map(plan => {
-        const finalPrice = convertPrice(plan.finalPriceCAD, displayCurrency, rates);
+
+        const finalPrice = convertPriceDisplay(plan.finalPriceCAD, displayCurrency, rates);
         const priceCAD = parseFloat(plan.finalPriceCAD.toFixed(4));
 
         // Strip internal pricing fields

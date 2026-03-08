@@ -13,7 +13,7 @@ const FX_STALE_TTL = 60 * 60 * 24;   // 24 hours
 const FX_LOCK_TTL = 20;
 
 // Base must match your provider's billing currency
-const FX_API_URL = `https://api.exchangerate-api.com/v4/latest/CAD`;
+const FX_API_URL = `https://api.exchangerate.host/latest?base=CAD`;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 

@@ -10,9 +10,11 @@ export const createOrder = async ({
     discount_value,
     final_price,
     currency,
-    promo_code
+    promo_code,
+    acceptTerms,
+    checkout_attempt_id
 }) => {
-
+console.log("user id is ",user_id)
     try {
 
         const query = `
@@ -28,9 +30,11 @@ export const createOrder = async ({
             final_price,
             currency,
             promo_code,
+            checkout_attempt_id,
+            terms_agreed,
             order_status
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'CREATED')
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'CREATED')
         `;
 
         const values = [
@@ -43,7 +47,9 @@ export const createOrder = async ({
             discount_value,
             final_price,
             currency || "CAD",
-            promo_code || null
+            promo_code || null,
+            checkout_attempt_id,
+            acceptTerms || 1
         ];
 
         const [result] = await db.query(query, values);

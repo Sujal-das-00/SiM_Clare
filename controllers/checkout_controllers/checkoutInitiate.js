@@ -3,14 +3,25 @@ import { handelResponse } from "../../utils/errorHandeler.js"
 
 export const checkout_initiate = async (req, res, next) => {
     try {
-        const { plan_id, destinationId, promocode = null } = req.body
+        const { plan_id, destinationId, promocode, countryCode, acceptTerms = 1, productname, checkout_attempt_id } = req.body;
+        if (acceptTerms === 0) return handelResponse(res, 400, "Please accept the Terms and Condition")
+        if (!checkout_attempt_id) return handelResponse(res, 400, "checkout_attempt_id is required");
         console.log(plan_id)
         const user_id = req.user.id;
-        console.log(user_id)
+        console.log("iuser id is", user_id)
         // const user_id = 1;
         if (!plan_id) return handelResponse(res, 400, "Please select a plan");
-        const price = await checkoutOrchestrator({ plan_id,destinationId, user_id, promocode })
-        return handelResponse(res,200,"data fetched successfully",price)
+        const response = await checkoutOrchestrator({
+            plan_id,
+            destinationId,
+            promocode,
+            countryCode,
+            acceptTerms,
+            user_id,
+            productname,
+            checkout_attempt_id
+        })
+        return handelResponse(res, 200, "data fetched successfully", response)
     } catch (error) {
         next(error)
     }

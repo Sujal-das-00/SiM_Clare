@@ -29,7 +29,6 @@ router.post('/auth/otp/resend', limiter(10 * 60 * 1000, 5), resendOtp)
 router.post("/device/check-compatibility",checkDeviceCompatibility);
 router.post('/validate/promocode',authenticateUser,validatePromoCode)
 router.post('/init',authenticateUser,checkout_initiate)
-
 router.get('/get/all-destination', fetchDestination)
 router.get('/get/sims/:destinationid', getSimByDestination)
 

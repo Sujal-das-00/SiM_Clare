@@ -6,6 +6,7 @@ import router from '../routes/routes.js';
 import { errorhandler } from '../middlewares/error_handeler.js';
 import limiter from '../middlewares/rateLimiter.js';
 import cookieParser from "cookie-parser";
+import { stripe_webhook_verifyPayment } from '../stripe/stripeWebhook.js';
 
 const app = express();
 app.use(helmet());
@@ -33,12 +34,15 @@ app.disable('x-powered-by');
 // app.use(cors(corsOptions));
 app.use(cors({
     origin: (origin, callback) => {
-        callback(null, true); // dynamically allow all origins
+        callback(null, origin); // dynamically allow all origins
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Stripe requires raw request body for webhook signature verification.
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripe_webhook_verifyPayment);
 
 app.use(express.json());
 

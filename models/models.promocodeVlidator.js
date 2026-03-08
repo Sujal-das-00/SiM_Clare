@@ -8,7 +8,7 @@ export async function validatePromoService({ code, order_amount, country_code, s
     );
 
     if (!promo) {
-        throw new AppError(404,"Invalid promo code.");
+        throw new AppError(404,"Please provide code.");
     }
 
     // ── 2. Active check ───────────────────────────────────────────
