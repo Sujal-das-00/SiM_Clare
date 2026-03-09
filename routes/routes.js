@@ -18,6 +18,7 @@ import { deletePromoCode } from '../controllers/Admin_controllers/admin.controll
 import { validatePromoCode } from '../controllers/controllers.promoCodeValidator.js';
 import { authenticateUser } from '../middlewares/clientAuth.js';
 import { checkout_initiate } from '../controllers/checkout_controllers/checkoutInitiate.js';
+import { saveCustomerData } from '../controllers/PurchaseInitiate.saveCustomerData.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
@@ -29,6 +30,7 @@ router.post('/auth/otp/resend', limiter(10 * 60 * 1000, 5), resendOtp)
 router.post("/device/check-compatibility",checkDeviceCompatibility);
 router.post('/validate/promocode',authenticateUser,validatePromoCode)
 router.post('/init',authenticateUser,checkout_initiate)
+router.post('/post/customer/data',authenticateUser,saveCustomerData)
 router.get('/get/all-destination', fetchDestination)
 router.get('/get/sims/:destinationid', getSimByDestination)
 

@@ -9,6 +9,8 @@ import { paymentGateway } from "../stripe/stripePayment.js";
 import { getCurrencyForCountry } from "../utils/currencyMapper.js"
 import { findOpenCheckoutAttempt } from "../models/Checkout_models/findOpenCheckoutAttempt.js";
 import stripe from "../config/stripe.js";
+import { getAdminBalance } from "../config/getAdminBalance.js";
+import AppError from "../utils/Apperror.js";
 export const checkoutOrchestrator = async (data) => {
     const {
         plan_id,
@@ -20,7 +22,7 @@ export const checkoutOrchestrator = async (data) => {
         productname,
         checkout_attempt_id
     } = data;
-    console.log("promocode is ",promocode)
+    console.log("promocode is ", promocode)
     const displayCurrency = getCurrencyForCountry(countryCode);
 
     // Reuse already-open checkout attempt to avoid duplicate orders/sessions on repeated clicks.
@@ -46,11 +48,17 @@ export const checkoutOrchestrator = async (data) => {
 
     const plan = await fetchSimPriceById(plan_id, destinationId)
     const base_price = plan.basePrice;
+    // const adminBalance = await getAdminBalance();
+    const adminBalance = 100
+    if (adminBalance < base_price) {
+        throw AppError(503, "Service temporarily unavailable")
+    }
 
     //fetch multiplier for the type and calculate the final price
 
     const enrichedPlan = await enrichWithMultiplier(plan, destinationId)
     const { finalPriceCAD, type: sim_type } = enrichedPlan[0];
+    
     let final_price = finalPriceCAD
     let discount_amount = 0;
     let discount_value = 0;
@@ -86,7 +94,7 @@ export const checkoutOrchestrator = async (data) => {
         acceptTerms,
         checkout_attempt_id
     });
-    console.log("final price is",final_price)
+    console.log("final price is", final_price)
     //mark promocode used
 
     if (promocode) {
@@ -118,6 +126,7 @@ export const checkoutOrchestrator = async (data) => {
         reused: false,
         final_price,
         order_id,
+        sim_type,
         sessionId: payment.sessionId,
         paymentIntentId: payment.paymentIntentId,
         checkoutUrl: payment.checkoutUrl

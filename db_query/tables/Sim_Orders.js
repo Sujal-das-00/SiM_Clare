@@ -56,6 +56,7 @@ const sim_Orders = async () => {
         'PAID',
         'PROVISIONING',
         'COMPLETED',
+        'AWAITING_BALANCE',
         'FAILED',
         'REFUNDED'
     ) DEFAULT 'CREATED',
@@ -134,10 +135,54 @@ const Stripe = `CREATE TABLE IF NOT EXISTS  stripe_webhook_events (
     processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );`
 
+const order_Provisioning = `CREATE TABLE IF NOT EXISTS order_provisioning (
+    
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    order_id BIGINT NOT NULL,
+    sim_type TINYINT NOT NULL,
+
+    -- TYPE 1
+    mobile_no VARCHAR(20),
+
+    -- TYPE 4
+    msisdn VARCHAR(20),
+    product_code VARCHAR(100),
+    product_type VARCHAR(50),
+
+    -- TYPE 3 (KYC required)
+    destination_id INT,
+    customer_name VARCHAR(100),
+    customer_surname1 VARCHAR(100),
+    customer_surname2 VARCHAR(100),
+    customer_document_type_id INT,
+    customer_document_number VARCHAR(100),
+    customer_birthdate DATE,
+    customer_sex CHAR(1),
+    customer_nationality_id INT,
+
+    -- Common
+    email VARCHAR(255),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Foreign key
+    CONSTRAINT fk_order_provisioning_order
+        FOREIGN KEY (order_id)
+        REFERENCES orders(id)
+        ON DELETE CASCADE,
+
+    INDEX idx_order_id (order_id),
+    INDEX idx_sim_type (sim_type)
+
+);`;
+
         await db.query(order_tbl);
         await db.query(payments);
         await db.query(sim_history);
         await db.query(Stripe);
+        await db.query(order_Provisioning)
         console.log("tables created");
 
         // ---- Existing DB migrations (idempotent) ----

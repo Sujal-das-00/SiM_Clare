@@ -9,7 +9,6 @@ export const checkout_initiate = async (req, res, next) => {
         console.log(plan_id)
         const user_id = req.user.id;
         console.log("iuser id is", user_id)
-        // const user_id = 1;
         if (!plan_id) return handelResponse(res, 400, "Please select a plan");
         const response = await checkoutOrchestrator({
             plan_id,

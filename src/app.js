@@ -32,14 +32,13 @@ app.disable('x-powered-by');
 // };
 
 // app.use(cors(corsOptions));
-app.use(cors({
-    origin: (origin, callback) => {
-        callback(null, origin); // dynamically allow all origins
-    },
+const corsOptions = {
+    origin: true,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+};
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 // Stripe requires raw request body for webhook signature verification.
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripe_webhook_verifyPayment);

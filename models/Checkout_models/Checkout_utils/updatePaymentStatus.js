@@ -1,7 +1,7 @@
-import db from "../../../config/db.js";
+import db from "../../../config/db.js"
 import AppError from "../../../utils/Apperror.js";
 
-export const updateOrderStatus = async (orderId, order_status) => {
+export const updateOrderStatus = async (orderId, order_status,conn=db) => {
     try {
         if (!orderId) {
             throw new AppError(400, "Order ID is required");
@@ -17,7 +17,7 @@ export const updateOrderStatus = async (orderId, order_status) => {
             WHERE id = ?
         `;
 
-        const [result] = await db.execute(query, [order_status, orderId]);
+        const [result] = await conn.execute(query, [order_status, orderId]);
 
         if (result.affectedRows === 0) {
             throw new AppError(404, "Order not found");

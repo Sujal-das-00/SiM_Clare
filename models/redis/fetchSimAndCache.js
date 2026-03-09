@@ -48,8 +48,10 @@ async function writeToCache(k, featuredPlans, totalRaw) {
 
 // ─── Provider Fetch + Revalidate ───────────────
 async function revalidateCache(country, k) {
+    console.log("errror occured",country)
     const response = await getSimByDestinationService(country);
     const products = response?.data?.data;
+    console.log(products)
 
     if (!Array.isArray(products) || products.length === 0) {
         throw new Error(`Provider returned empty data for: ${country}`);

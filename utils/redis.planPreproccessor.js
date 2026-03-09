@@ -86,6 +86,7 @@ function stripToMinimal(plan, tierLabel, category) {
 
     return {
         id: plan.productID,
+        planName : productName,
         type: plan.productType,
         basePrice: price,
         currency: plan.productCurrency || "USD",

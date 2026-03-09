@@ -1,155 +1,171 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Stripe Checkout Test</title>
+    <meta charset="UTF-8">
+    <title>Stripe Checkout Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+        }
 
-<style>
-body{
-    font-family: Arial, sans-serif;
-    max-width:700px;
-    margin:40px auto;
-}
-.section{
-    border:1px solid #ccc;
-    padding:20px;
-    margin-bottom:30px;
-}
-input{
-    display:block;
-    margin:10px 0;
-    padding:8px;
-    width:100%;
-}
-button{
-    padding:10px 16px;
-    cursor:pointer;
-}
-pre{
-    background:#f4f4f4;
-    padding:10px;
-}
-</style>
+        .section {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
 
+        input {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+        }
+
+        button {
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>Backend Payment Test Console</h1>
+    <h1>Backend Payment Test Console</h1>
 
-<div class="section">
+    <div class="section">
+        <h2>Login</h2>
+        <input id="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <pre id="loginResult"></pre>
+    </div>
 
-<h2>Login</h2>
+    <div class="section">
+        <h2>Test Payment</h2>
+        <button onclick="startPayment()">Buy Japan eSIM</button>
+        <pre id="paymentResult"></pre>
+    </div>
 
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
+    <script>
+        let checkoutAttemptId = null;
 
-<button onclick="login()">Login</button>
+        async function login() {
+            const payload = {
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            };
 
-<pre id="loginResult"></pre>
+            try {
+                const res = await fetch("http://127.0.0.1:7000/api/auth/login", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-</div>
+                const data = await res.json();
+                document.getElementById("loginResult").textContent =
+                    JSON.stringify(data, null, 2);
 
-<div class="section">
+                alert("Login request sent. Cookie should now be stored.");
 
-<h2>Test Payment</h2>
-
-<button onclick="startPayment()">Buy Japan eSIM</button>
-
-<pre id="paymentResult"></pre>
-
-</div>
-
-<script>
-let checkoutAttemptId = null;
-
-async function login(){
-
-    const payload = {
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value
-    };
-
-    try{
-
-        const res = await fetch("http://127.0.0.1:7000/api/auth/login",{
-            method:"POST",
-            credentials:"include",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        document.getElementById("loginResult").textContent =
-        JSON.stringify(data,null,2);
-
-        alert("Login request sent. Cookie should now be stored.");
-
-    }catch(err){
-
-        console.error(err);
-
-    }
-
-}
-
-
-async function startPayment(){
-    if (!checkoutAttemptId) {
-        checkoutAttemptId = crypto.randomUUID();
-    }
-    const buyBtn = document.querySelector('button[onclick="startPayment()"]');
-    buyBtn.disabled = true;
-    buyBtn.textContent = "Processing...";
-
-    const payload = {
-        plan_id:"eSIM-JP500M-01",
-        destinationId:"JYN-1",
-        countryCode:"IN",
-        promocode:"NEW20",
-        acceptTerms:1,
-        productname:"japanESim",
-        checkout_attempt_id: checkoutAttemptId
-    };
-
-    try{
-
-        const res = await fetch("http://127.0.0.1:7000/api/init",{
-            method:"POST",
-            credentials:"include",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        document.getElementById("paymentResult").textContent =
-        JSON.stringify(data,null,2);
-
-        const checkoutUrl = data?.data?.checkoutUrl || data?.checkoutUrl;
-
-        if(checkoutUrl){
-            window.location.href = checkoutUrl;
+            } catch (err) {
+                console.error("Login error:", err);
+            }
         }
 
-    }catch(err){
+        async function startPayment() {
+            if (!checkoutAttemptId) {
+                checkoutAttemptId = crypto.randomUUID();
+            }
 
-        console.error(err);
+            const buyBtn = document.querySelector('button[onclick="startPayment()"]');
+            buyBtn.disabled = true;
+            buyBtn.textContent = "Processing...";
 
-    }finally{
-        buyBtn.disabled = false;
-        buyBtn.textContent = "Buy Japan eSIM";
-    }
+            const payload = {
+                plan_id: "eSIM-JP500M-01",
+                destinationId: "JYN-1",
+                countryCode: "IN",
+                acceptTerms: 1,
+                productname: "japanESim",
+                checkout_attempt_id: checkoutAttemptId
+            };
 
-}
+            try {
+                // --- 1st API Call ---
+                const res = await fetch("http://127.0.0.1:7000/api/init", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-</script>
+                if (!res.ok) {
+                    console.error("Init failed with status:", res.status);
+                    document.getElementById("paymentResult").textContent =
+                        `Init API failed with status: ${res.status}`;
+                    return;
+                }
+
+                const data = await res.json();
+                console.log("Init response data:", data);
+                console.log(data.data.order_id)
+                console.log(data.data.sim_type)
+
+                // --- 2nd API Call ---
+                const customerRes = await fetch("http://127.0.0.1:7000/api/post/customer/data", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        order_id: data.data.order_id ?? data.orderId,
+                        sim_type: data.data.sim_type,
+                        sku: "eSIM-JP500M-01",
+                        quantity: 1
+                    })
+                });
+
+                // Log the full error body, not just the status
+                if (!customerRes.ok) {
+                    const errorBody = await customerRes.json();
+                    console.error("Customer API failed:", customerRes.status, errorBody);
+                    document.getElementById("paymentResult").textContent =
+                        `Error ${customerRes.status}: ${JSON.stringify(errorBody, null, 2)}`;
+                    return;
+                }
+                // --- Show result and redirect ---
+                document.getElementById("paymentResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+                const checkoutUrl = data?.data?.checkoutUrl || data?.checkoutUrl;
+                if (checkoutUrl) {
+                    window.location.href = checkoutUrl;
+                }
+
+            } catch (err) {
+                console.error("Payment error:", err);
+                document.getElementById("paymentResult").textContent =
+                    `Error: ${err.message}`;
+            } finally {
+                buyBtn.disabled = false;
+                buyBtn.textContent = "Buy Japan eSIM";
+            }
+        }
+    </script>
 
 </body>
+
 </html>

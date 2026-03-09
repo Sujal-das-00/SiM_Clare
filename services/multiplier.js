@@ -50,7 +50,6 @@ async function fetchMultiplierMap(destinationid) {
  * @returns {Promise<Array>}
  */
 export async function enrichWithMultiplier(jsonplans, destinationid) {
-
     const plans = Array.isArray(jsonplans)
         ? jsonplans
         : jsonplans?.id
