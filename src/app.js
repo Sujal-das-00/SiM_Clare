@@ -7,6 +7,7 @@ import { errorhandler } from '../middlewares/error_handeler.js';
 import limiter from '../middlewares/rateLimiter.js';
 import cookieParser from "cookie-parser";
 import { stripe_webhook_verifyPayment } from '../stripe/stripeWebhook.js';
+import '../utils/Queues/purchaseOrderWorker.js';
 
 const app = express();
 app.use(helmet());
@@ -32,13 +33,33 @@ app.disable('x-powered-by');
 // };
 
 // app.use(cors(corsOptions));
+const defaultAllowedOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'https://simclaire.com',
+    'https://www.simclaire.com'
+];
+
+const envOrigins = (process.env.CORS_ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
+const allowedOrigins = new Set([...defaultAllowedOrigins, ...envOrigins]);
+
 const corsOptions = {
-    origin: true,
+    origin: (origin, callback) => {
+        // Allow non-browser tools (curl/postman) with no Origin header
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.has(origin)) return callback(null, true);
+        return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 };
 app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
 
 // Stripe requires raw request body for webhook signature verification.
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripe_webhook_verifyPayment);

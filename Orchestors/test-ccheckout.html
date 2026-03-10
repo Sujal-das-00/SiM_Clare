@@ -56,6 +56,16 @@
 
     <script>
         let checkoutAttemptId = null;
+        const queryParams = new URLSearchParams(window.location.search);
+        const apiBase = (
+            queryParams.get("apiBase") ||
+            localStorage.getItem("apiBase") ||
+            "http://127.0.0.1:7000"
+        ).replace(/\/$/, "");
+
+        if (queryParams.get("apiBase")) {
+            localStorage.setItem("apiBase", apiBase);
+        }
 
         async function login() {
             const payload = {
@@ -64,7 +74,7 @@
             };
 
             try {
-                const res = await fetch("http://127.0.0.1:7000/api/auth/login", {
+                const res = await fetch(`${apiBase}/api/auth/login`, {
                     method: "POST",
                     credentials: "include",
                     headers: {
@@ -94,17 +104,17 @@
             buyBtn.textContent = "Processing...";
 
             const payload = {
-                plan_id: "eSIM-JP500M-01",
-                destinationId: "JYN-1",
+                plan_id: "TEST28",
+                destinationId: "AL-1",
                 countryCode: "IN",
                 acceptTerms: 1,
-                productname: "japanESim",
+                productname: "Albenia e sim",
                 checkout_attempt_id: checkoutAttemptId
             };
 
             try {
                 // --- 1st API Call ---
-                const res = await fetch("http://127.0.0.1:7000/api/init", {
+                const res = await fetch(`${apiBase}/api/init`, {
                     method: "POST",
                     credentials: "include",
                     headers: {
@@ -126,14 +136,14 @@
                 console.log(data.data.sim_type)
 
                 // --- 2nd API Call ---
-                const customerRes = await fetch("http://127.0.0.1:7000/api/post/customer/data", {
+                const customerRes = await fetch(`${apiBase}/api/post/customer/data`, {
                     method: "POST",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         order_id: data.data.order_id ?? data.orderId,
                         sim_type: data.data.sim_type,
-                        sku: "eSIM-JP500M-01",
+                        sku: "TEST28",
                         quantity: 1
                     })
                 });

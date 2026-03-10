@@ -6,7 +6,8 @@ import { getOrderById } from "./stripeModels.getEsimPrice.js";
 import { updateOrderStatus } from "../models/Checkout_models/Checkout_utils/updatePaymentStatus.js";
 import { updatePaymentStatusByIntent } from "./Webhooks/updatePaymentTable.js"
 import { getAdminBalance } from "../config/getAdminBalance.js";
-import { getOrder_data_PayloadController } from "../controllers/api_payload_controller..models/getOrderbyId.js";
+import { queueEsimPurchase } from "../utils/Queues/purchaseQueueModel.js";
+import { createProvisioningRecord } from "../models/APIs_EndPoint/saveEsimPurchaseData.js";
 export const stripe_webhook_verifyPayment = async (req, res) => {
 
     const signature = req.headers["stripe-signature"];
@@ -61,7 +62,6 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
                 /**
                  * Fetch order
                  */
-                console.log("hello world")
                 const order = await getOrderById(orderId);
                 if (!order.order_id) {
                     console.error("Order not found:", orderId);
@@ -89,13 +89,13 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
                     await updateOrderStatus(orderId, "PAYMENT_MISMATCH");
                     break;
                 }
-                const payload = await getOrder_data_PayloadController(orderId)
-                console.log("payload is ",payload)
-                const esim = await buyEsimFromProvider(payload);
+                const response = await queueEsimPurchase(orderId)
+                console.log("=======================================")
+                console.log("purchase sucessfull data");
                 /**
                  * Begin transaction
                  */
-
+                await createProvisioningRecord(esim)
                 const conn = await db.getConnection();
 
                 await conn.beginTransaction();
@@ -132,7 +132,7 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
 
                         await updateOrderStatus(
                             orderId,
-                            "COMPLETED",
+                            "PAID",
                             conn
                         );
 

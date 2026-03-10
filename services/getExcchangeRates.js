@@ -13,9 +13,26 @@ const FX_STALE_TTL = 60 * 60 * 24;   // 24 hours
 const FX_LOCK_TTL = 20;
 
 // Base must match your provider's billing currency
-const FX_API_URL = `https://api.exchangerate.host/latest?base=CAD`;
+const FX_API_URL = `https://open.er-api.com/v6/latest/CAD`;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+function extractRatesFromPayload(data) {
+    if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+
+    // exchangerate.host / most providers
+    if (data.rates && typeof data.rates === "object") return data.rates;
+
+    // Some APIs nest payloads
+    if (data.data?.rates && typeof data.data.rates === "object") return data.data.rates;
+
+    // ex: open.er-api style
+    if (data.conversion_rates && typeof data.conversion_rates === "object") {
+        return data.conversion_rates;
+    }
+
+    return null;
+}
 
 function normalizeRatesPayload(payload, label) {
     if (!payload) return null;
@@ -54,11 +71,22 @@ async function fetchFromAPI() {
     if (!res.ok) throw new Error(`FX API error: ${res.status} ${res.statusText}`);
 
     const data = await res.json();
-    if (!data?.rates || typeof data.rates !== "object") {
-        throw new Error("FX API returned malformed response");
-    }
+    const rates = extractRatesFromPayload(data);
+    if (rates) return rates;
 
-    return data.rates;
+    // Preserve root cause details when provider returns an error object.
+    const providerMessage =
+        data?.error?.info ||
+        data?.error?.message ||
+        data?.message ||
+        data?.error ||
+        null;
+
+    throw new Error(
+        providerMessage
+            ? `FX API returned malformed response: ${providerMessage}`
+            : "FX API returned malformed response"
+    );
 }
 
 async function writeToCache(rates) {

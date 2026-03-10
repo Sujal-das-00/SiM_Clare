@@ -1,4 +1,6 @@
 
+import dotenv from "dotenv"
+dotenv.config()
 const DATA_TIERS = [
     { label: "300MB", min: 0, max: 499 },
     { label: "500MB", min: 500, max: 999 },
@@ -82,11 +84,11 @@ function getDataTier(plan) {
 }
 function stripToMinimal(plan, tierLabel, category) {
     const price = getBasePrice(plan);
-    if (!price) return null; 
+    if (!price) return null;
 
     return {
         id: plan.productID,
-        planName : productName,
+        planName: plan.productName || "",
         type: plan.productType,
         basePrice: price,
         currency: plan.productCurrency || "USD",
@@ -94,16 +96,16 @@ function stripToMinimal(plan, tierLabel, category) {
         // Data
         data: parseFloat(plan.productDataAllowance) || 0,
         dataUnit: plan.dataAllowanceUnit || "MB",
-        dataMB: normalizeToMB(plan),              
+        dataMB: normalizeToMB(plan),
         hasVoice: getVoiceMinutes(plan) > 0,
         voiceMinutes: getVoiceMinutes(plan),
         // SMS
         hasSms: getSmsCount(plan) > 0,
         smsCount: getSmsCount(plan),
-        tierLabel,  
+        tierLabel,
         category,
         local: plan.local === "true",
-        localCountry:plan.localCountry,
+        localCountry: plan.localCountry,
         supportedCountries: plan.destinations
     };
 }
@@ -184,6 +186,14 @@ export function curatePlans(products) {
         console.warn("[Curator] No products provided");
         return [];
     }
+    //=======================development=========================================
+    const isDev = process.env.NODE_ENV !== "production";
+    if (isDev) {
+        console.log("[Curator] DEV mode active → returning raw plans");
+        return parsePlansDirect(products);
+    }
+
+    //======================production=============================================
     const validProducts = products.filter(p => {
         const price = getBasePrice(p);
         const hasId = Boolean(p.productID);
@@ -214,4 +224,17 @@ export function curatePlans(products) {
     }, {});
 
     return result;
+}
+
+//=-------------------------------------------development
+function parsePlansDirect(products) {
+    return products
+        .filter(p => {
+            const price = getBasePrice(p);
+            const hasId = Boolean(p.productID);
+            const hasDays = Number.isFinite(p.productValidityDays) && p.productValidityDays > 0;
+            return price > 0 && hasId && hasDays;
+        })
+        .map(p => stripToMinimal(p, "dev", "raw"))
+        .filter(Boolean);
 }

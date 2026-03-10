@@ -29,7 +29,7 @@ export const getSimByDestinationOrchestrator = async (destinationId, countryCode
 
 
     } catch (error) {
-        logger.log(`[Orchestrator] Failed for destination="${destinationId}":`, error.message)
+        logger.error(`[Orchestrator] Failed for destination="${destinationId}": ${error.message}`)
         throw error
     }
 }   //

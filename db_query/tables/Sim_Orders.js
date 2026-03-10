@@ -178,11 +178,113 @@ const order_Provisioning = `CREATE TABLE IF NOT EXISTS order_provisioning (
 
 );`;
 
+const esim_history = `CREATE TABLE esim_purchase_history (
+
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    -- internal system references
+    order_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+
+    -- provider identifiers
+    provider_purchase_id VARCHAR(100),
+    provider_reference VARCHAR(100),
+    provider_client_id VARCHAR(50),
+
+    -- product information
+    sku VARCHAR(100) NOT NULL,
+    product_type INT,
+    quantity INT DEFAULT 1,
+
+    -- eSIM credentials
+    activation_code TEXT,
+    iccid VARCHAR(25),
+    msisdn VARCHAR(20),
+    nsce VARCHAR(50),
+    pin_code VARCHAR(20),
+    puk VARCHAR(50),
+    smdp_url VARCHAR(255),
+
+    -- financial details
+    provider_currency VARCHAR(10) DEFAULT 'USD',
+    provider_amount DECIMAL(10,2),
+    provider_billed_amount DECIMAL(10,2),
+    provider_balance_after DECIMAL(10,2),
+
+    -- provider response status
+    provider_status_code INT,
+    provider_status_msg VARCHAR(255),
+    provider_status_desc VARCHAR(255),
+
+    -- provider timestamps
+    provider_txn_time DATETIME,
+
+    -- provider user data
+    provider_mobile VARCHAR(30),
+    provider_email VARCHAR(255),
+
+    -- internal lifecycle tracking
+    provisioning_status ENUM(
+        'INITIATED',
+        'REQUEST_SENT',
+        'QUEUED',
+        'PURCHASED',
+        'ACTIVATED',
+        'FAILED'
+    ) DEFAULT 'INITIATED',
+
+    retry_count INT DEFAULT 0,
+
+    -- full provider response
+    raw_response JSON,
+
+    -- auditing
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- indexes
+    INDEX idx_order_id (order_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_provider_purchase_id (provider_purchase_id),
+    INDEX idx_iccid (iccid),
+    INDEX idx_msisdn (msisdn)
+
+);`;
+
+const Userviews = `CREATE VIEW user_esim_view AS
+SELECT
+    id,
+    order_id,
+    user_id,
+
+    -- provider identifiers visible to user
+    provider_purchase_id,
+    provider_reference,
+
+    -- product info
+    sku,
+    product_type,
+    quantity,
+
+    -- esim credentials
+    iccid,
+    activation_code,
+    msisdn,
+
+    -- status info
+    provisioning_status,
+    provider_txn_time,
+
+    created_at
+FROM esim_purchase_history;`
+
         await db.query(order_tbl);
         await db.query(payments);
         await db.query(sim_history);
         await db.query(Stripe);
         await db.query(order_Provisioning)
+        await db.query(esim_history)
+        await db.query(Userviews)
         console.log("tables created");
 
         // ---- Existing DB migrations (idempotent) ----
