@@ -5,9 +5,7 @@ import { isEventProcessed, storeProcessedEvent } from "./Webhooks/EventWebhook.j
 import { getOrderById } from "./stripeModels.getEsimPrice.js";
 import { updateOrderStatus } from "../models/Checkout_models/Checkout_utils/updatePaymentStatus.js";
 import { updatePaymentStatusByIntent } from "./Webhooks/updatePaymentTable.js"
-import { getAdminBalance } from "../config/getAdminBalance.js";
 import { queueEsimPurchase } from "../utils/Queues/purchaseQueueModel.js";
-import { createProvisioningRecord } from "../models/APIs_EndPoint/saveEsimPurchaseData.js";
 export const stripe_webhook_verifyPayment = async (req, res) => {
 
     const signature = req.headers["stripe-signature"];
@@ -63,7 +61,7 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
                  * Fetch order
                  */
                 const order = await getOrderById(orderId);
-                if (!order.order_id) {
+                if (!order?.order_id) {
                     console.error("Order not found:", orderId);
                     break;
                 }
@@ -82,20 +80,18 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
                  * Validate payment amount
                  */
                 
-                const expectedPrice = order.paid_amount
+                const expectedPrice = order.base_price
                 const paidAmount = session.unit_amount / 100;
                 if (paidAmount < expectedPrice) {
                     console.error("Payment amount mismatch");
-                    await updateOrderStatus(orderId, "PAYMENT_MISMATCH");
+                    await updatePaymentStatusByIntent(
+                        orderId,
+                        "FAILED",
+                        paymentIntent
+                    );
+                    await updateOrderStatus(orderId, "FAILED");
                     break;
                 }
-                const response = await queueEsimPurchase(orderId)
-                console.log("=======================================")
-                console.log("purchase sucessfull data");
-                /**
-                 * Begin transaction
-                 */
-                await createProvisioningRecord(esim)
                 const conn = await db.getConnection();
 
                 await conn.beginTransaction();
@@ -117,9 +113,9 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
                      * Check admin balance
                      */
 
-                    // const adminBalance = await getAdminBalance();
                     const adminBalance = 100;
-
+                    console.log("epected price is  " ,expectedPrice)
+                    console.log(adminBalance<expectedPrice)
                     if (adminBalance < expectedPrice) {
 
                         await updateOrderStatus(
@@ -152,6 +148,11 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
 
                 }
 
+                const adminBalance = 100;
+                if (adminBalance >= expectedPrice) {
+                    await queueEsimPurchase(orderId);
+                }
+
                 console.log("Order processed:", orderId);
 
                 break;
@@ -172,6 +173,16 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
                     null,
                     "FAILED",
                     intent.id
+                );
+
+                await db.query(
+                    `
+                    UPDATE orders o
+                    JOIN payments p ON p.order_id = o.id
+                    SET o.order_status = 'FAILED'
+                    WHERE p.stripe_payment_intent_id = ?
+                    `,
+                    [intent.id]
                 );
 
                 break;

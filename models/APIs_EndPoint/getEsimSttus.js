@@ -10,7 +10,7 @@ export const getEsimStatusService = async (purchaseId) => {
         const baseURL = isDev ? process.env.UAT_URL : process.env.PROD_URL;
 
         const response = await axios.post(
-            `${baseURL}esim/getesimstatus`,
+            `${baseURL}esim/esimstatus`,
             {
                 purchaseID: String(purchaseId)
             },

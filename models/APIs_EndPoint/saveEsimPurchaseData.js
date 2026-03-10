@@ -1,6 +1,40 @@
 import db from "../../config/db.js";
 
+const getOrderProvisioningDefaults = async (orderId) => {
+    if (!orderId) {
+        return {};
+    }
+
+    const [rows] = await db.query(
+        `
+        SELECT
+            o.user_id,
+            o.sim_id,
+            o.sim_type
+        FROM orders o
+        WHERE o.id = ?
+        LIMIT 1
+        `,
+        [orderId]
+    );
+
+    return rows[0] || {};
+};
+
+const normalizeProvisioningData = async (data) => {
+    const orderDefaults = await getOrderProvisioningDefaults(data.order_id);
+
+    return {
+        ...data,
+        user_id: data.user_id ?? orderDefaults.user_id ?? null,
+        sku: data.sku ?? orderDefaults.sim_id ?? "UNKNOWN",
+        product_type: data.product_type ?? orderDefaults.sim_type ?? null
+    };
+};
+
 export const createProvisioningRecord = async (data) => {
+    const normalizedData = await normalizeProvisioningData(data);
+
     const query = `
         INSERT INTO esim_purchase_history (
             order_id,
@@ -27,25 +61,25 @@ export const createProvisioningRecord = async (data) => {
     `;
 
     const values = [
-        data.order_id || null,
-        data.user_id || null,
-        data.provider_purchase_id || null,
-        data.provider_reference || null,
-        data.sku || "UNKNOWN",
-        data.product_type || null,
-        data.quantity || 1,
-        data.activation_code || null,
-        data.iccid || null,
-        data.msisdn || null,
-        data.nsce || null,
-        data.puk || null,
-        data.provider_currency || "USD",
-        data.provider_amount || null,
-        data.provider_status_code || null,
-        data.provider_status_msg || null,
-        data.provider_txn_time || null,
-        data.provisioning_status || "INITIATED",
-        JSON.stringify(data.raw_response || {})
+        normalizedData.order_id || null,
+        normalizedData.user_id || null,
+        normalizedData.provider_purchase_id || null,
+        normalizedData.provider_reference || null,
+        normalizedData.sku || "UNKNOWN",
+        normalizedData.product_type || null,
+        normalizedData.quantity || 1,
+        normalizedData.activation_code || null,
+        normalizedData.iccid || null,
+        normalizedData.msisdn || null,
+        normalizedData.nsce || null,
+        normalizedData.puk || null,
+        normalizedData.provider_currency || "USD",
+        normalizedData.provider_amount || null,
+        normalizedData.provider_status_code || null,
+        normalizedData.provider_status_msg || null,
+        normalizedData.provider_txn_time || null,
+        normalizedData.provisioning_status || "INITIATED",
+        JSON.stringify(normalizedData.raw_response || {})
     ];
 
     const [result] = await db.query(query, values);
@@ -65,73 +99,74 @@ export const getProvisioningByOrderId = async (orderId) => {
 };
 
 export const upsertProvisioningCheckpoint = async (data) => {
-    const existing = await getProvisioningByOrderId(data.order_id);
+    const normalizedData = await normalizeProvisioningData(data);
+    const existing = await getProvisioningByOrderId(normalizedData.order_id);
 
     if (!existing) {
-        return createProvisioningRecord(data);
+        return createProvisioningRecord(normalizedData);
     }
 
     const fields = [];
     const values = [];
 
-    if (Object.prototype.hasOwnProperty.call(data, "provider_purchase_id")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "provider_purchase_id")) {
         fields.push("provider_purchase_id = ?");
-        values.push(data.provider_purchase_id);
+        values.push(normalizedData.provider_purchase_id);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "provider_reference")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "provider_reference")) {
         fields.push("provider_reference = ?");
-        values.push(data.provider_reference);
+        values.push(normalizedData.provider_reference);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "activation_code")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "activation_code")) {
         fields.push("activation_code = ?");
-        values.push(data.activation_code);
+        values.push(normalizedData.activation_code);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "iccid")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "iccid")) {
         fields.push("iccid = ?");
-        values.push(data.iccid);
+        values.push(normalizedData.iccid);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "msisdn")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "msisdn")) {
         fields.push("msisdn = ?");
-        values.push(data.msisdn);
+        values.push(normalizedData.msisdn);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "nsce")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "nsce")) {
         fields.push("nsce = ?");
-        values.push(data.nsce);
+        values.push(normalizedData.nsce);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "puk")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "puk")) {
         fields.push("puk = ?");
-        values.push(data.puk);
+        values.push(normalizedData.puk);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "provider_status_code")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "provider_status_code")) {
         fields.push("provider_status_code = ?");
-        values.push(data.provider_status_code);
+        values.push(normalizedData.provider_status_code);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "provider_status_msg")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "provider_status_msg")) {
         fields.push("provider_status_msg = ?");
-        values.push(data.provider_status_msg);
+        values.push(normalizedData.provider_status_msg);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "provider_txn_time")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "provider_txn_time")) {
         fields.push("provider_txn_time = ?");
-        values.push(data.provider_txn_time);
+        values.push(normalizedData.provider_txn_time);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "provisioning_status")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "provisioning_status")) {
         fields.push("provisioning_status = ?");
-        values.push(data.provisioning_status);
+        values.push(normalizedData.provisioning_status);
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, "raw_response")) {
+    if (Object.prototype.hasOwnProperty.call(normalizedData, "raw_response")) {
         fields.push("raw_response = ?");
-        values.push(JSON.stringify(data.raw_response || {}));
+        values.push(JSON.stringify(normalizedData.raw_response || {}));
     }
 
     if (!fields.length) {
@@ -144,8 +179,30 @@ export const upsertProvisioningCheckpoint = async (data) => {
         WHERE order_id = ?
     `;
 
-    values.push(data.order_id);
+    values.push(normalizedData.order_id);
 
     await db.query(query, values);
     return existing.id;
+};
+
+export const updateProvisioningStatus = async (id, status) => {
+    const query = `
+        UPDATE esim_purchase_history
+        SET provisioning_status = ?
+        WHERE id = ?
+    `;
+
+    const [result] = await db.query(query, [status, id]);
+    return result.affectedRows;
+};
+
+export const incrementRetry = async (id) => {
+    const query = `
+        UPDATE esim_purchase_history
+        SET retry_count = retry_count + 1
+        WHERE id = ?
+    `;
+
+    const [result] = await db.query(query, [id]);
+    return result.affectedRows;
 };

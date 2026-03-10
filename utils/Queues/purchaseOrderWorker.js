@@ -5,6 +5,7 @@ import { getOrder_data_PayloadController } from "../../controllers/api_payload_c
 import { buyEsimFromProviderService } from "../../models/APIs_EndPoint/buyEsimFromProvider.js";
 import { getEsimStatusService } from "../../models/APIs_EndPoint/getEsimSttus.js";
 import { upsertProvisioningCheckpoint } from "../../models/APIs_EndPoint/saveEsimPurchaseData.js";
+import { updateOrderStatus } from "../../models/Checkout_models/Checkout_utils/updatePaymentStatus.js";
 import { purchaseQueue } from "./purchaseQueue.js";
 
 const MAX_POLL_ATTEMPTS = 30;
@@ -50,6 +51,7 @@ const purchaseWorker = new Worker(
         if (job.name === "purchase") {
             const { orderId } = job.data;
 
+            await updateOrderStatus(orderId, "PROVISIONING");
             await upsertProvisioningCheckpoint({
                 order_id: orderId,
                 provisioning_status: "INITIATED",
@@ -65,6 +67,7 @@ const purchaseWorker = new Worker(
                 const purchaseId = getPurchaseIdFromResponse(providerResponse);
 
                 if (!purchaseId) {
+                    await updateOrderStatus(orderId, "FAILED");
                     await upsertProvisioningCheckpoint({
                         order_id: orderId,
                         provisioning_status: "FAILED",
@@ -98,6 +101,7 @@ const purchaseWorker = new Worker(
                     purchaseId
                 };
             } catch (error) {
+                await updateOrderStatus(orderId, "FAILED");
                 await upsertProvisioningCheckpoint({
                     order_id: orderId,
                     provisioning_status: "FAILED",
@@ -119,6 +123,7 @@ const purchaseWorker = new Worker(
                 const normalizedStatus = getNormalizedStatus(statusPayload);
 
                 if (isFailedStatus(normalizedStatus)) {
+                    await updateOrderStatus(orderId, "FAILED");
                     await upsertProvisioningCheckpoint({
                         order_id: orderId,
                         provider_purchase_id: purchaseId,
@@ -131,6 +136,7 @@ const purchaseWorker = new Worker(
 
                 if (!isCompletedStatus(normalizedStatus)) {
                     if (attempts >= MAX_POLL_ATTEMPTS) {
+                        await updateOrderStatus(orderId, "FAILED");
                         await upsertProvisioningCheckpoint({
                             order_id: orderId,
                             provider_purchase_id: purchaseId,
@@ -176,12 +182,15 @@ const purchaseWorker = new Worker(
                     raw_response: response
                 });
 
+                await updateOrderStatus(orderId, "COMPLETED");
+
                 return {
                     orderId,
                     purchaseId,
                     status: "COMPLETED"
                 };
             } catch (error) {
+                await updateOrderStatus(orderId, "FAILED");
                 await upsertProvisioningCheckpoint({
                     order_id: orderId,
                     provider_purchase_id: purchaseId,
