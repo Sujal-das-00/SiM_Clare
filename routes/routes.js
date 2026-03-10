@@ -19,6 +19,7 @@ import { validatePromoCode } from '../controllers/controllers.promoCodeValidator
 import { authenticateUser } from '../middlewares/clientAuth.js';
 import { checkout_initiate } from '../controllers/checkout_controllers/checkoutInitiate.js';
 import { saveCustomerData } from '../controllers/PurchaseInitiate.saveCustomerData.js';
+import { convertPiceDisplay } from '../models/convertCurrencyFrontend.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
@@ -34,6 +35,7 @@ router.post('/post/customer/data',authenticateUser,saveCustomerData)
 router.get('/get/all-destination', fetchDestination)
 router.get('/get/sims/:destinationid', getSimByDestination)
 
+router.post('/get/exchangeRates',convertPiceDisplay)
 //admin
 router.post('/admin/update/sim-multiplier',updateSimMultiplier)
 router.post('/admin/delete/sim-multiplier',deleteSimMultiplier)

@@ -12,7 +12,7 @@ export async function convertPriceStripe(priceCAD, targetCurrency) {
             //: Math.round((priceCAD + Number.EPSILON) * 100)
         };
     }
-    const converted = convertCurrency(priceCAD, targetCurrency, rates);
+    const converted = await convertCurrency(priceCAD, targetCurrency, rates);
     return {
         currency: targetCurrency.toLowerCase(),
         amount:converted

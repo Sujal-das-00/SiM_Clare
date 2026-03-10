@@ -8,8 +8,8 @@ const FX_KEY = "esim:fx:rates";
 const FX_META_KEY = "esim:fx:meta";
 const FX_STALE_KEY = "esim:fx:stale";
 const FX_LOCK_KEY = "esim:fx:lock";
-const FX_TTL = 60 * 60;        // 1 hour
-const FX_STALE_TTL = 60 * 60 * 24;   // 24 hours
+const FX_TTL = 60 * 60 *2;        // 2 hour
+const FX_STALE_TTL = 60 * 60 * 12;   // 12 hours
 const FX_LOCK_TTL = 20;
 
 // Base must match your provider's billing currency

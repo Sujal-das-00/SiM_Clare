@@ -36,7 +36,7 @@ export const COUNTRY_TO_CURRENCY = {
 
 };
 
-const DEFAULT_CURRENCY = "USD";
+const DEFAULT_CURRENCY = "CAD";
 
 /**
  * Returns the ISO 4217 currency code for a given ISO 3166-1 alpha-2 country code.
