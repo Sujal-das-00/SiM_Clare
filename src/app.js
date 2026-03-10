@@ -7,7 +7,6 @@ import { errorhandler } from '../middlewares/error_handeler.js';
 import limiter from '../middlewares/rateLimiter.js';
 import cookieParser from "cookie-parser";
 import { stripe_webhook_verifyPayment } from '../stripe/stripeWebhook.js';
-import '../utils/Queues/purchaseOrderWorker.js';
 
 const app = express();
 app.use(helmet());

@@ -27,8 +27,8 @@ export const userLogin = async (req, res, next) => {
         }
         res.cookie('token', user, {
             httpOnly: true,
-            secure: false,
-            sameSite: 'Lax',
+            secure: true,
+            sameSite: 'None',
             maxAge: 3600000,
         });
         res.status(200).json({ status: "success", message: "user looged in successfuly"})

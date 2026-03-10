@@ -20,6 +20,9 @@ import { authenticateUser } from '../middlewares/clientAuth.js';
 import { checkout_initiate } from '../controllers/checkout_controllers/checkoutInitiate.js';
 import { saveCustomerData } from '../controllers/PurchaseInitiate.saveCustomerData.js';
 import { convertPiceDisplay } from '../models/convertCurrencyFrontend.js';
+import { getUserHistory } from '../controllers/controllers.Userhistory.js';
+import { getUserDetailsByAdmin } from '../controllers/Admin_controllers/admin.getUserDetailsByAdmin.js';
+import { getUserEsimHistoryById } from '../controllers/Admin_controllers/admin.getUserEsimHistoryById.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
@@ -29,16 +32,23 @@ router.post('/auth/password/reset', limiter(5 * 60 * 1000, 5), resetPassword)
 router.post('/auth/otp/verify', limiter(5 * 60 * 1000, 5), verifyOtp)
 router.post('/auth/otp/resend', limiter(10 * 60 * 1000, 5), resendOtp)
 router.post("/device/check-compatibility",checkDeviceCompatibility);
+
 router.post('/validate/promocode',authenticateUser,validatePromoCode)
 router.post('/init',authenticateUser,checkout_initiate)
 router.post('/post/customer/data',authenticateUser,saveCustomerData)
+router.get('/get/user/history',authenticateUser,getUserHistory)
+
+
 router.get('/get/all-destination', fetchDestination)
 router.get('/get/sims/:destinationid', getSimByDestination)
-
 router.post('/get/exchangeRates',convertPiceDisplay)
+
 //admin
 router.post('/admin/update/sim-multiplier',updateSimMultiplier)
 router.post('/admin/delete/sim-multiplier',deleteSimMultiplier)
+router.get('/admin/get/userdata',getUserDetailsByAdmin)
+router.get('/admin/get/user/esimHistorybyId/:esim_history_id',getUserEsimHistoryById)
+
 
 router.get('/admin/get/sim-multiplier',getMultiplierData)
 
