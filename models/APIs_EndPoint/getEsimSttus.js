@@ -2,21 +2,18 @@ import axios from "axios";
 import logger from "../../utils/looger.js";
 import GetAdminJwt from "../../config/Adminauth.js";
 
-
-export const buyEsimFromProviderService = async (payload) => {
+export const getEsimStatusService = async (purchaseId) => {
     try {
-
         const token = await GetAdminJwt();
 
         const isDev = process.env.NODE_ENV !== "production";
-
-        const baseURL = isDev
-            ? process.env.UAT_URL
-            : process.env.PROD_URL;
+        const baseURL = isDev ? process.env.UAT_URL : process.env.PROD_URL;
 
         const response = await axios.post(
-            `${baseURL}esim/purchaseesimasync`,
-            payload,
+            `${baseURL}esim/getesimstatus`,
+            {
+                purchaseID: String(purchaseId)
+            },
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -26,10 +23,9 @@ export const buyEsimFromProviderService = async (payload) => {
         );
 
         return response.data;
-
     } catch (error) {
-
-        logger.error("Provider eSIM purchase error:", {
+        logger.error("Provider eSIM status error:", {
+            purchaseId,
             message: error.message,
             data: error.response?.data
         });
