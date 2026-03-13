@@ -6,26 +6,6 @@
     "auditLog": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/audit/app-audit.json",
     "files": [
         {
-            "date": 1771872815474,
-            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/24-02-2026-app.log",
-            "hash": "6656504fc705935f39d42abb456052db7991c1c8d7bdd5e64dce7c22600efbcd"
-        },
-        {
-            "date": 1772012031235,
-            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/25-02-2026-app.log",
-            "hash": "57517ea51da7b8f3917dfa83478d912c43c591f836253ef86d7f0577452439f4"
-        },
-        {
-            "date": 1772102455266,
-            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/26-02-2026-app.log",
-            "hash": "0cefa26d1abddb43982dace74c3978231372671a99a0c508b2d80c7625ce02a6"
-        },
-        {
-            "date": 1772188508025,
-            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/27-02-2026-app.log",
-            "hash": "79c8f638345cc4c9aa6c2b47f46c9bffcef0939a94a11ec7a9410d0a412d8150"
-        },
-        {
             "date": 1772217339073,
             "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/28-02-2026-app.log",
             "hash": "4a43f383a9ab3dfc8f8c607b74495d350adf9086914999bfbe6b0f7a7eeefac5"
@@ -74,6 +54,16 @@
             "date": 1773081001352,
             "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/10-03-2026-app.log",
             "hash": "9b12e5cf48427bfedf67b6de2e9adcdb09422fc14d65b68d7537d8653cc84b70"
+        },
+        {
+            "date": 1773167722382,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/11-03-2026-app.log",
+            "hash": "bd431a23cdf2cec67a58e6f0f546d1c87979797557eeb5c9f33d2935a3cd49fe"
+        },
+        {
+            "date": 1773412207405,
+            "name": "/home/suajldas/Desktop/Freelance/SiMClare_Backend/logs/app/13-03-2026-app.log",
+            "hash": "5891734676412693cb475e6ac5c2fedd6769d4da7cd903fe7472610051326f79"
         }
     ],
     "hashType": "sha256"

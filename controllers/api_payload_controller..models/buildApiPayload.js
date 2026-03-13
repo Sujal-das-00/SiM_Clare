@@ -7,7 +7,7 @@ export const buildType1Payload = async (orderId) => {
     SELECT 
     o.id,
     o.sim_id,
-    COALESCE(p.mobile_no, u.phone) AS mobile_no,
+    COALESCE(u.phone,p.mobile_no) AS mobile_no,
     u.email
     FROM orders o
     JOIN users u ON o.user_id = u.id
@@ -68,23 +68,12 @@ export const buildType2Payload = async (orderId) => {
     };
 };
 
-export const buildType3Payload = async (orderId) => {
-
+export const getType3OrderBaseData = async (orderId) => {
     const query = `
-        SELECT 
+        SELECT
             o.id,
-            o.sim_id,
-            p.destination_id,
-            p.customer_name,
-            p.customer_surname1,
-            p.customer_surname2,
-            p.customer_document_type_id,
-            p.customer_document_number,
-            p.customer_birthdate,
-            p.customer_sex,
-            p.customer_nationality_id
+            o.sim_id
         FROM orders o
-        JOIN order_provisioning p ON o.id = p.order_id
         WHERE o.id = ?
         LIMIT 1
     `;
@@ -93,7 +82,15 @@ export const buildType3Payload = async (orderId) => {
 
     if (!rows.length) throw new Error("Type3 order data not found");
 
-    const order = rows[0];
+    return rows[0];
+};
+
+export const buildType3PayloadFromTransientData = async (orderId, type3CustomerData) => {
+    const order = await getType3OrderBaseData(orderId);
+
+    if (!type3CustomerData) {
+        throw new Error("Type3 customer data is required for transient provisioning");
+    }
 
     return {
         items: [
@@ -102,15 +99,15 @@ export const buildType3Payload = async (orderId) => {
                 sku: order.sim_id,
                 quantity: 1,
                 productCode: order.sim_id.toUpperCase(),
-                destinationId: String(order.destination_id),
-                customer_name: order.customer_name,
-                customer_surname1: order.customer_surname1,
-                customer_surname2: order.customer_surname2,
-                customer_document_type_id: order.customer_document_type_id,
-                customer_document_number: order.customer_document_number,
-                customer_birthdate: order.customer_birthdate,
-                customer_sex: order.customer_sex,
-                customer_nationality_id: order.customer_nationality_id
+                destinationId: String(type3CustomerData.destination_id),
+                customer_name: type3CustomerData.customer_name,
+                customer_surname1: type3CustomerData.customer_surname1,
+                customer_surname2: type3CustomerData.customer_surname2 || null,
+                customer_document_type_id: type3CustomerData.customer_document_type_id,
+                customer_document_number: type3CustomerData.customer_document_number,
+                customer_birthdate: type3CustomerData.customer_birthdate,
+                customer_sex: type3CustomerData.customer_sex,
+                customer_nationality_id: type3CustomerData.customer_nationality_id
             }
         ]
     };

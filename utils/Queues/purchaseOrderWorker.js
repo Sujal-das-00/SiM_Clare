@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
 import bullRedis from "../../config/bullIoredis.js";
 
-import { getOrder_data_PayloadController } from "../../controllers/api_payload_controller..models/getOrderbyId.js";
+import { getOrder_data_PayloadController } from "../../controllers/api_payload_controller..models/controller.PayloadMAP_Engine.js";
 import { buyEsimFromProviderService } from "../../models/APIs_EndPoint/buyEsimFromProvider.js";
 import { getEsimStatusService } from "../../models/APIs_EndPoint/getEsimSttus.js";
 import { upsertProvisioningCheckpoint } from "../../models/APIs_EndPoint/saveEsimPurchaseData.js";
@@ -49,7 +49,7 @@ const purchaseWorker = new Worker(
     "esim-purchase",
     async (job) => {
         if (job.name === "purchase") {
-            const { orderId } = job.data;
+            const { orderId, type3CustomerData = null } = job.data;
 
             await updateOrderStatus(orderId, "PROVISIONING");
             await upsertProvisioningCheckpoint({
@@ -62,7 +62,9 @@ const purchaseWorker = new Worker(
             });
 
             try {
-                const payload = await getOrder_data_PayloadController(orderId);
+                const payload = await getOrder_data_PayloadController(orderId, {
+                    type3CustomerData
+                });
                 const providerResponse = await buyEsimFromProviderService(payload);
                 const purchaseId = getPurchaseIdFromResponse(providerResponse);
 

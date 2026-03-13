@@ -19,6 +19,7 @@ import { validatePromoCode } from '../controllers/controllers.promoCodeValidator
 import { authenticateUser } from '../middlewares/clientAuth.js';
 import { checkout_initiate } from '../controllers/checkout_controllers/checkoutInitiate.js';
 import { saveCustomerData } from '../controllers/PurchaseInitiate.saveCustomerData.js';
+import { queueType3CustomerData } from '../controllers/PurchaseInitiate.queueType3CustomerData.js';
 import { convertPiceDisplay } from '../models/convertCurrencyFrontend.js';
 import { getUserHistory } from '../controllers/controllers.Userhistory.js';
 import { getUserDetailsByAdmin } from '../controllers/Admin_controllers/admin.getUserDetailsByAdmin.js';
@@ -36,6 +37,7 @@ router.post("/device/check-compatibility",checkDeviceCompatibility);
 router.post('/validate/promocode',authenticateUser,validatePromoCode)
 router.post('/init',authenticateUser,checkout_initiate)
 router.post('/post/customer/data',authenticateUser,saveCustomerData)
+router.post('/post/customer/data/type3/queue',authenticateUser,queueType3CustomerData)
 router.get('/get/user/history',authenticateUser,getUserHistory)
 
 
@@ -46,7 +48,7 @@ router.post('/get/exchangeRates',convertPiceDisplay)
 //admin
 router.post('/admin/update/sim-multiplier',updateSimMultiplier)
 router.post('/admin/delete/sim-multiplier',deleteSimMultiplier)
-router.get('/admin/get/userdata',getUserDetailsByAdmin)
+router.post('/admin/get/userdata',getUserDetailsByAdmin)
 router.get('/admin/get/user/esimHistorybyId/:esim_history_id',getUserEsimHistoryById)
 
 

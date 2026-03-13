@@ -149,7 +149,7 @@ export const stripe_webhook_verifyPayment = async (req, res) => {
                 }
 
                 const adminBalance = 100;
-                if (adminBalance >= expectedPrice) {
+                if (adminBalance >= expectedPrice && Number(order.sim_type) !== 3) {
                     await queueEsimPurchase(orderId);
                 }
 

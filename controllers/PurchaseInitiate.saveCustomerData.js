@@ -1,4 +1,5 @@
 import { saveCustomerOrderProvisioningService } from "../models/model.saveCustomerpayload.js";
+import AppError from "../utils/Apperror.js";
 
 export const saveCustomerData = async (req, res, next) => {
     try {
@@ -9,16 +10,7 @@ export const saveCustomerData = async (req, res, next) => {
             mobile_no,
             msisdn,
             product_code,
-            product_type,
-            destination_id,
-            customer_name,
-            customer_surname1,
-            customer_surname2,
-            customer_document_type_id,
-            customer_document_number,
-            customer_birthdate,
-            customer_sex,
-            customer_nationality_id,
+            product_type
         } = req.body;
 
         if (!order_id || !sim_type) {
@@ -28,6 +20,13 @@ export const saveCustomerData = async (req, res, next) => {
             });
         }
 
+        if (Number(sim_type) === 3) {
+            throw new AppError(
+                400,
+                "Use /api/post/customer/data/type3/queue for sim_type 3 orders"
+            );
+        }
+
         const data = {
             order_id,
             sim_type,
@@ -35,15 +34,6 @@ export const saveCustomerData = async (req, res, next) => {
             msisdn,
             product_code,
             product_type,
-            destination_id,
-            customer_name,
-            customer_surname1,
-            customer_surname2,
-            customer_document_type_id,
-            customer_document_number,
-            customer_birthdate,
-            customer_sex,
-            customer_nationality_id,
             email
         };
 

@@ -150,17 +150,6 @@ const order_Provisioning = `CREATE TABLE IF NOT EXISTS order_provisioning (
     product_code VARCHAR(100),
     product_type VARCHAR(50),
 
-    -- TYPE 3 (KYC required)
-    destination_id INT,
-    customer_name VARCHAR(100),
-    customer_surname1 VARCHAR(100),
-    customer_surname2 VARCHAR(100),
-    customer_document_type_id INT,
-    customer_document_number VARCHAR(100),
-    customer_birthdate DATE,
-    customer_sex CHAR(1),
-    customer_nationality_id INT,
-
     -- Common
     email VARCHAR(255),
 
@@ -325,6 +314,27 @@ FROM esim_purchase_history;`
                 `CREATE INDEX idx_session_id ON payments(stripe_sessionId)`
             );
             console.log("Migration: created index idx_session_id");
+        }
+
+        const orderProvisioningColumnsToDrop = [
+            "destination_id",
+            "customer_name",
+            "customer_surname1",
+            "customer_surname2",
+            "customer_document_type_id",
+            "customer_document_number",
+            "customer_birthdate",
+            "customer_sex",
+            "customer_nationality_id"
+        ];
+
+        for (const columnName of orderProvisioningColumnsToDrop) {
+            if (await hasColumn("order_provisioning", columnName)) {
+                await db.query(
+                    `ALTER TABLE order_provisioning DROP COLUMN ${columnName}`
+                );
+                console.log(`Migration: dropped order_provisioning.${columnName}`);
+            }
         }
 
         console.log("schema migration complete");

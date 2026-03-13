@@ -27,11 +27,18 @@
         button {
             padding: 10px 16px;
             cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
         }
 
         pre {
             background: #f4f4f4;
             padding: 10px;
+        }
+
+        .hint {
+            color: #555;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -50,12 +57,132 @@
 
     <div class="section">
         <h2>Test Payment</h2>
-        <button onclick="startPayment()">Buy Japan eSIM</button>
+        <p class="hint">
+            The page now fetches a real plan for the selected sim type before calling checkout.
+            It will prefer <code>TEST28</code> when that plan matches the selected type.
+        </p>
+        <button id="type1Btn" onclick="startPaymentFlow('type1')">Buy Type 1 eSIM</button>
+        <button id="type2Btn" onclick="startPaymentFlow('type2')">Buy Type 2 eSIM</button>
+        <button id="type3Btn" onclick="startPaymentFlow('type3')">Buy Type 3 eSIM</button>
         <pre id="paymentResult"></pre>
     </div>
 
     <script>
         let checkoutAttemptId = null;
+        const FLOW_CONFIGS = {
+            type1: {
+                desiredType: 1,
+                buttonId: "type1Btn",
+                label: "Buy Type 1 eSIM",
+                processingLabel: "Processing Type 1...",
+                initPayload: {
+                    destinationId: "AL-1",
+                    countryCode: "IN",
+                    acceptTerms: 1,
+                    productname: "Type 1 eSIM"
+                },
+                customerRoute: "/api/post/customer/data",
+                buildCustomerPayload(orderId) {
+                    return {
+                        order_id: orderId,
+                        sim_type: 1,
+                        product_code: "TEST28",
+                        product_type: "1"
+                    };
+                },
+                sampleProviderPayload: {
+                    items: [
+                        {
+                            type: "1",
+                            sku: "TEST28",
+                            quantity: 1,
+                            mobileno: "<from logged-in user>",
+                            emailid: "<from logged-in user>"
+                        }
+                    ]
+                }
+            },
+            type2: {
+                desiredType: 2,
+                buttonId: "type2Btn",
+                label: "Buy Type 2 eSIM",
+                processingLabel: "Processing Type 2...",
+                initPayload: {
+                    destinationId: "AL-1",
+                    countryCode: "IN",
+                    acceptTerms: 1,
+                    productname: "Type 2 eSIM"
+                },
+                customerRoute: "/api/post/customer/data",
+                buildCustomerPayload(orderId) {
+                    return {
+                        order_id: orderId,
+                        sim_type: 2,
+                        product_code: "TEST28",
+                        product_type: "2"
+                    };
+                },
+                sampleProviderPayload: {
+                    items: [
+                        {
+                            type: "2",
+                            sku: "TEST28",
+                            quantity: 1,
+                            emailid: "<from logged-in user>"
+                        }
+                    ]
+                }
+            },
+            type3: {
+                desiredType: 3,
+                buttonId: "type3Btn",
+                label: "Buy Type 3 eSIM",
+                processingLabel: "Processing Type 3...",
+                initPayload: {
+                    destinationId: "AL-1",
+                    countryCode: "IN",
+                    acceptTerms: 1,
+                    productname: "Type 3 eSIM"
+                },
+                customerRoute: "/api/post/customer/data/type3/queue",
+                buildCustomerPayload(orderId) {
+                    return {
+                        order_id: orderId,
+                        sim_type: 3,
+                        destination_id: 9,
+                        customer_name: "John",
+                        customer_surname1: "Doe",
+                        customer_surname2: "Smith",
+                        customer_document_type_id: 1,
+                        customer_document_number: "12345678A",
+                        customer_birthdate: "1990-01-01",
+                        customer_sex: "M",
+                        customer_nationality_id: 1
+                    };
+                },
+                sampleProviderPayload: {
+                    items: [
+                        {
+                            type: "3",
+                            sku: "TEST28",
+                            quantity: 1,
+                            productCode: "TEST28",
+                            destinationId: "9",
+                            customer_name: "John",
+                            customer_surname1: "Doe",
+                            customer_surname2: "Smith",
+                            customer_document_type_id: 1,
+                            customer_document_number: "12345678A",
+                            customer_birthdate: "1990-01-01",
+                            customer_sex: "M",
+                            customer_nationality_id: 1,
+                            emailid: "<from logged-in user>"
+                        }
+                    ]
+                }
+            }
+        };
+        const PREFERRED_PLAN_ID = "TEST28";
         const queryParams = new URLSearchParams(window.location.search);
         const apiBase = (
             queryParams.get("apiBase") ||
@@ -94,26 +221,59 @@
             }
         }
 
-        async function startPayment() {
+        function setButtonsDisabled(disabled) {
+            Object.values(FLOW_CONFIGS).forEach((config) => {
+                const button = document.getElementById(config.buttonId);
+                button.disabled = disabled;
+                button.textContent = disabled ? config.processingLabel : config.label;
+            });
+        }
+
+        async function fetchPlanForType(config) {
+            const simsRes = await fetch(
+                `${apiBase}/api/get/sims/${config.initPayload.destinationId}?countryCode=${encodeURIComponent(config.initPayload.countryCode)}`,
+                {
+                    method: "GET",
+                    credentials: "include"
+                }
+            );
+
+            if (!simsRes.ok) {
+                throw new Error(`Failed to fetch plans for sim type ${config.desiredType}`);
+            }
+
+            const simsData = await simsRes.json();
+            const plans = simsData?.data?.plans || [];
+            const matchingPlans = plans.filter((plan) => Number(plan.type) === Number(config.desiredType));
+
+            if (!matchingPlans.length) {
+                throw new Error(`No plan found for sim type ${config.desiredType}`);
+            }
+
+            const preferredPlan =
+                matchingPlans.find((plan) => String(plan.id) === PREFERRED_PLAN_ID) ||
+                matchingPlans[0];
+
+            return preferredPlan;
+        }
+
+        async function startPaymentFlow(flowKey) {
+            const config = FLOW_CONFIGS[flowKey];
             if (!checkoutAttemptId) {
                 checkoutAttemptId = crypto.randomUUID();
             }
 
-            const buyBtn = document.querySelector('button[onclick="startPayment()"]');
-            buyBtn.disabled = true;
-            buyBtn.textContent = "Processing...";
-
-            const payload = {
-                plan_id: "TEST28",
-                destinationId: "AL-1",
-                countryCode: "IN",
-                acceptTerms: 1,
-                productname: "Albenia e sim",
-                checkout_attempt_id: checkoutAttemptId
-            };
+            setButtonsDisabled(true);
 
             try {
-                // --- 1st API Call ---
+                const selectedPlan = await fetchPlanForType(config);
+
+                const payload = {
+                    ...config.initPayload,
+                    plan_id: selectedPlan.id,
+                    checkout_attempt_id: checkoutAttemptId
+                };
+
                 const res = await fetch(`${apiBase}/api/init`, {
                     method: "POST",
                     credentials: "include",
@@ -132,23 +292,20 @@
 
                 const data = await res.json();
                 console.log("Init response data:", data);
-                console.log(data.data.order_id)
-                console.log(data.data.sim_type)
+                console.log(data.data.order_id);
+                console.log(data.data.sim_type);
 
-                // --- 2nd API Call ---
-                const customerRes = await fetch(`${apiBase}/api/post/customer/data`, {
+                const orderId = data.data.order_id ?? data.orderId;
+                const actualSimType = Number(data.data.sim_type);
+                const customerPayload = config.buildCustomerPayload(orderId);
+
+                const customerRes = await fetch(`${apiBase}${config.customerRoute}`, {
                     method: "POST",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        order_id: data.data.order_id ?? data.orderId,
-                        sim_type: data.data.sim_type,
-                        sku: "TEST28",
-                        quantity: 1
-                    })
+                    body: JSON.stringify(customerPayload)
                 });
 
-                // Log the full error body, not just the status
                 if (!customerRes.ok) {
                     const errorBody = await customerRes.json();
                     console.error("Customer API failed:", customerRes.status, errorBody);
@@ -156,9 +313,21 @@
                         `Error ${customerRes.status}: ${JSON.stringify(errorBody, null, 2)}`;
                     return;
                 }
-                // --- Show result and redirect ---
+
+                const customerData = await customerRes.json();
                 document.getElementById("paymentResult").textContent =
-                    JSON.stringify(data, null, 2);
+                    JSON.stringify({
+                        selected_flow: flowKey,
+                        selected_plan_id: selectedPlan.id,
+                        selected_plan_type: Number(selectedPlan.type),
+                        expected_sim_type: Number(customerPayload.sim_type),
+                        actual_sim_type_from_init: actualSimType,
+                        init_response: data,
+                        customer_api_route: config.customerRoute,
+                        customer_api_payload: customerPayload,
+                        customer_api_response: customerData,
+                        sample_provider_payload: config.sampleProviderPayload
+                    }, null, 2);
 
                 const checkoutUrl = data?.data?.checkoutUrl || data?.checkoutUrl;
                 if (checkoutUrl) {
@@ -170,8 +339,7 @@
                 document.getElementById("paymentResult").textContent =
                     `Error: ${err.message}`;
             } finally {
-                buyBtn.disabled = false;
-                buyBtn.textContent = "Buy Japan eSIM";
+                setButtonsDisabled(false);
             }
         }
     </script>

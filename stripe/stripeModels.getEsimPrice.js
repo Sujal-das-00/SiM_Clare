@@ -7,6 +7,7 @@ export const getOrderById = async (orderId) => {
             o.id AS order_id,
             o.base_price,
             o.order_status,
+            o.sim_type,
             COALESCE(p.amount, 0) AS paid_amount
         FROM orders o
         LEFT JOIN payments p

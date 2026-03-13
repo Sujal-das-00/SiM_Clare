@@ -35,11 +35,13 @@ export const getUserDetailsByAdmin = async (req, res, next) => {
             o.promo_code,
             o.order_status,
             o.created_at,
+            o.terms_agreed,
 
             p.id AS payment_id,
             p.stripe_payment_intent_id,
             p.stripe_sessionId,
             p.amount AS payment_amount,
+            p.currency AS payment_currency,
             p.payment_status,
 
             eph.id AS esim_history_id,
@@ -56,7 +58,7 @@ export const getUserDetailsByAdmin = async (req, res, next) => {
             ON eph.order_id = o.id
 
         WHERE o.user_id = ?
-        ORDER BY o.created_at DESC
+        ORDER BY o.created_at DESC;
         `;
 
         const [userData] = await db.query(UserDataQuery, [userId]);

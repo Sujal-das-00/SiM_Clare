@@ -10,18 +10,9 @@ export const saveCustomerOrderProvisioningService = async (data) => {
             msisdn,
             product_code,
             product_type,
-            destination_id,
-            customer_name,
-            customer_surname1,
-            customer_surname2,
-            customer_document_type_id,
-            customer_document_number,
-            customer_birthdate,
-            customer_sex,
-            customer_nationality_id,
             email
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -31,15 +22,6 @@ export const saveCustomerOrderProvisioningService = async (data) => {
         data.msisdn || null,
         data.product_code || null,
         data.product_type || null,
-        data.destination_id || null,
-        data.customer_name || null,
-        data.customer_surname1 || null,
-        data.customer_surname2 || null,
-        data.customer_document_type_id || null,
-        data.customer_document_number || null,
-        data.customer_birthdate || null,
-        data.customer_sex || null,
-        data.customer_nationality_id || null,
         data.email || null
     ];
 

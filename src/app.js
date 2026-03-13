@@ -87,7 +87,7 @@ app.get("/health",limiter(5*60*1000,6), async (req, res) => {
             timestamp: new Date()
         });
     } catch (error) {
-        console.error("Health check DB error:", error.message);
+        console.log("Health check DB error:", error.message);
         res.status(500).json({
             status: "error",
             database: "sleeping or unreachable"
