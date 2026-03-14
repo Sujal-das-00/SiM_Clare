@@ -54,7 +54,7 @@ function normalizeRatesPayload(payload, label) {
 }
 
 async function acquireLock(key) {
-    const res = await redisClient.set(key, "1", { nx: true, ex: FX_LOCK_TTL });
+    const res = await redisClient.set(key, "1", "EX", FX_LOCK_TTL, "NX");
     return res === "OK" || res === 1 || res === true;
 }
 
@@ -98,9 +98,9 @@ async function writeToCache(rates) {
     };
 
     const results = await Promise.allSettled([
-        redisClient.set(FX_KEY, JSON.stringify(rates), { ex: FX_TTL }),
-        redisClient.set(FX_META_KEY, JSON.stringify(meta), { ex: FX_TTL }),
-        redisClient.set(FX_STALE_KEY, JSON.stringify(rates), { ex: FX_STALE_TTL }),
+        redisClient.set(FX_KEY, JSON.stringify(rates), "EX", FX_TTL),
+        redisClient.set(FX_META_KEY, JSON.stringify(meta), "EX", FX_TTL),
+        redisClient.set(FX_STALE_KEY, JSON.stringify(rates), "EX", FX_STALE_TTL),
     ]);
 
     const failures = results.filter((r) => r.status === "rejected");

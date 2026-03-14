@@ -22,7 +22,7 @@ const keys = (country) => ({
 // ─── Lock Helpers ───────────────
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 async function acquireLock(lockKey) {
-    const result = await redisClient.set(lockKey, "1", { nx: true, ex: LOCK_TTL });
+    const result = await redisClient.set(lockKey, "1", "EX", LOCK_TTL, "NX");
     return result === "OK" || result === 1 || result === true;
 }
 
@@ -40,9 +40,9 @@ async function writeToCache(k, featuredPlans, totalRaw) {
         expiresAt: Date.now() + CACHE_TTL * 1000,
     };
     await Promise.all([
-        redisClient.set(k.featured, JSON.stringify(featuredPlans), { ex: CACHE_TTL }),
-        redisClient.set(k.meta, JSON.stringify(meta), { ex: CACHE_TTL }),
-        redisClient.set(k.stale, JSON.stringify(featuredPlans), { ex: STALE_TTL }),
+        redisClient.set(k.featured, JSON.stringify(featuredPlans), "EX", CACHE_TTL),
+        redisClient.set(k.meta, JSON.stringify(meta), "EX", CACHE_TTL),
+        redisClient.set(k.stale, JSON.stringify(featuredPlans), "EX", STALE_TTL),
     ]);
 }
 
