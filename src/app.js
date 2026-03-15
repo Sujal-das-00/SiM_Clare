@@ -39,7 +39,8 @@ const defaultAllowedOrigins = [
     'http://localhost:5500',
     'http://127.0.0.1:5500',
     'https://simclaire.com',
-    'https://www.simclaire.com'
+    'https://www.simclaire.com',
+    "https://sim-claire-admin.vercel.app"
 ];
 
 const envOrigins = (process.env.CORS_ALLOWED_ORIGINS || '')

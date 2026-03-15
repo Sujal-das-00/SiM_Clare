@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import bullRedis from "../../config/bullIoredis.js";
+import { bullRedis } from "../../config/bullIoredis.js";
 
 
 export const purchaseQueue = new Queue("esim-purchase", {
