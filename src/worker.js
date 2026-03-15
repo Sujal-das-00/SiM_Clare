@@ -20,4 +20,9 @@ process.on("SIGTERM", () => {
     });
 });
 
-console.log("Purchase worker is running");
+purchaseWorker.run().catch((error) => {
+    console.error("Purchase worker failed to start:", error);
+    process.exit(1);
+});
+
+console.log("Purchase worker is starting");

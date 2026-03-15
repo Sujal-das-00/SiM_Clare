@@ -1,5 +1,4 @@
 import { Worker } from "bullmq";
-import bullRedis from "../../config/bullIoredis.js";
 
 import { getOrder_data_PayloadController } from "../../controllers/api_payload_controller..models/controller.PayloadMAP_Engine.js";
 import { buyEsimFromProviderService } from "../../models/APIs_EndPoint/buyEsimFromProvider.js";
@@ -7,6 +6,7 @@ import { getEsimStatusService } from "../../models/APIs_EndPoint/getEsimSttus.js
 import { upsertProvisioningCheckpoint } from "../../models/APIs_EndPoint/saveEsimPurchaseData.js";
 import { updateOrderStatus } from "../../models/Checkout_models/Checkout_utils/updatePaymentStatus.js";
 import { purchaseQueue } from "./purchaseQueue.js";
+import { bullRedis } from "../../config/bullIoredis.js";
 
 const MAX_POLL_ATTEMPTS = 30;
 const POLL_DELAY_MS = 10000;
@@ -212,6 +212,7 @@ const purchaseWorker = new Worker(
     },
     {
         connection: bullRedis,
+        autorun: false,
         limiter: {
             max: 5,
             duration: 1000
