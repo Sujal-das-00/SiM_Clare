@@ -11,6 +11,8 @@ import { findOpenCheckoutAttempt } from "../models/Checkout_models/findOpenCheck
 import stripe from "../config/stripe.js";
 import { getAdminBalance } from "../config/getAdminBalance.js";
 import AppError from "../utils/Apperror.js";
+import logger from "../utils/looger.js";
+
 export const checkoutOrchestrator = async (data) => {
     const {
         plan_id,
@@ -22,7 +24,6 @@ export const checkoutOrchestrator = async (data) => {
         productname,
         checkout_attempt_id
     } = data;
-    console.log("promocode is ", promocode)
     const displayCurrency = getCurrencyForCountry(countryCode);
 
     // Reuse already-open checkout attempt to avoid duplicate orders/sessions on repeated clicks.
@@ -40,31 +41,35 @@ export const checkoutOrchestrator = async (data) => {
                 };
             }
         } catch (error) {
-            console.error("Unable to reuse Stripe session:", error.message);
+            logger.error(
+                `[checkoutOrchestrator] Unable to reuse Stripe session for checkout_attempt_id=${checkout_attempt_id}: ${error.message}`
+            );
         }
     }
 
-    //fetch price and type from redis
 
     const plan = await fetchSimPriceById(plan_id, destinationId)
+    if (!plan) {
+        throw AppError(404, "Selected plan is unavailable")
+    }
+
     const base_price = plan.basePrice;
-    // const adminBalance = await getAdminBalance();
     const adminBalance = 100
     if (adminBalance < base_price) {
         throw AppError(503, "Service temporarily unavailable")
     }
 
-    //fetch multiplier for the type and calculate the final price
 
     const enrichedPlan = await enrichWithMultiplier(plan, destinationId)
     const { finalPriceCAD, type: sim_type } = enrichedPlan[0];
-    
+
     let final_price = finalPriceCAD
-    final_price += (finalPriceCAD * 0.025);
+    const maxMul = 4;
+    const fee = Math.min(finalPriceCAD * 0.025, maxMul);
+    final_price += fee;
     let discount_amount = 0;
     let discount_value = 0;
 
-    //Validate promocode if present
 
     if (promocode) {
         const promoResult = await validatePromoService({
@@ -79,7 +84,6 @@ export const checkoutOrchestrator = async (data) => {
         discount_value = promoResult.discount_value || 0;
     }
 
-    //insert into orders table also update the order status to CREATED
 
     const order_id = await createOrder({
         user_id,
@@ -95,7 +99,6 @@ export const checkoutOrchestrator = async (data) => {
         acceptTerms,
         checkout_attempt_id
     });
-    console.log("final price is", final_price)
     //mark promocode used
 
     if (promocode) {

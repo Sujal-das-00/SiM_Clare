@@ -1,4 +1,5 @@
 import db from '../../config/db.js'
+import logger from '../../utils/looger.js';
 
 export const createOrder = async ({
     user_id,
@@ -14,7 +15,6 @@ export const createOrder = async ({
     acceptTerms,
     checkout_attempt_id
 }) => {
-console.log("user id is ",user_id)
     try {
 
         const query = `
@@ -57,9 +57,7 @@ console.log("user id is ",user_id)
         return result.insertId;
 
     } catch (error) {
-
-        console.error("Create Order Error:", error);
+        logger.error(`[createOrder] Failed for user_id=${user_id}, plan_id=${plan_id}: ${error.message}`);
         throw error;
-
     }
 };

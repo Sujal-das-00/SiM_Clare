@@ -48,6 +48,16 @@
     <h1>Backend Payment Test Console</h1>
 
     <div class="section">
+        <h2>Environment</h2>
+        <input id="apiBaseInput" placeholder="API Base URL">
+        <input id="destinationIdInput" placeholder="Destination ID">
+        <p class="hint">
+            This page remembers the API base and destination in local storage. Verify they match the backend and
+            destination you use in Postman.
+        </p>
+    </div>
+
+    <div class="section">
         <h2>Login</h2>
         <input id="email" placeholder="Email">
         <input id="password" type="password" placeholder="Password">
@@ -76,7 +86,6 @@
                 label: "Buy Type 1 eSIM",
                 processingLabel: "Processing Type 1...",
                 initPayload: {
-                    destinationId: "AL-1",
                     countryCode: "IN",
                     acceptTerms: 1,
                     productname: "Type 1 eSIM"
@@ -108,7 +117,6 @@
                 label: "Buy Type 2 eSIM",
                 processingLabel: "Processing Type 2...",
                 initPayload: {
-                    destinationId: "AL-1",
                     countryCode: "IN",
                     acceptTerms: 1,
                     productname: "Type 2 eSIM"
@@ -139,7 +147,6 @@
                 label: "Buy Type 3 eSIM",
                 processingLabel: "Processing Type 3...",
                 initPayload: {
-                    destinationId: "AL-1",
                     countryCode: "IN",
                     acceptTerms: 1,
                     productname: "Type 3 eSIM"
@@ -189,10 +196,37 @@
             localStorage.getItem("apiBase") ||
             "http://127.0.0.1:7000"
         ).replace(/\/$/, "");
+        const destinationId = (
+            queryParams.get("destinationId") ||
+            localStorage.getItem("destinationId") ||
+            "BL-1"
+        ).trim().toUpperCase();
 
         if (queryParams.get("apiBase")) {
             localStorage.setItem("apiBase", apiBase);
         }
+        if (queryParams.get("destinationId")) {
+            localStorage.setItem("destinationId", destinationId);
+        }
+
+        document.getElementById("apiBaseInput").value = apiBase;
+        document.getElementById("destinationIdInput").value = destinationId;
+
+        Object.values(FLOW_CONFIGS).forEach((config) => {
+            config.initPayload.destinationId = destinationId;
+        });
+
+        document.getElementById("apiBaseInput").addEventListener("change", (event) => {
+            const nextValue = event.target.value.trim().replace(/\/$/, "");
+            localStorage.setItem("apiBase", nextValue);
+            window.location.search = `?apiBase=${encodeURIComponent(nextValue)}&destinationId=${encodeURIComponent(document.getElementById("destinationIdInput").value.trim().toUpperCase())}`;
+        });
+
+        document.getElementById("destinationIdInput").addEventListener("change", (event) => {
+            const nextValue = event.target.value.trim().toUpperCase();
+            localStorage.setItem("destinationId", nextValue);
+            window.location.search = `?apiBase=${encodeURIComponent(document.getElementById("apiBaseInput").value.trim().replace(/\/$/, ""))}&destinationId=${encodeURIComponent(nextValue)}`;
+        });
 
         async function login() {
             const payload = {
@@ -239,7 +273,8 @@
             );
 
             if (!simsRes.ok) {
-                throw new Error(`Failed to fetch plans for sim type ${config.desiredType}`);
+                const errorBody = await simsRes.text();
+                throw new Error(`Failed to fetch plans for sim type ${config.desiredType}: ${simsRes.status} ${errorBody}`);
             }
 
             const simsData = await simsRes.json();
@@ -318,6 +353,8 @@
                 document.getElementById("paymentResult").textContent =
                     JSON.stringify({
                         selected_flow: flowKey,
+                        api_base: apiBase,
+                        destination_id: config.initPayload.destinationId,
                         selected_plan_id: selectedPlan.id,
                         selected_plan_type: Number(selectedPlan.type),
                         expected_sim_type: Number(customerPayload.sim_type),

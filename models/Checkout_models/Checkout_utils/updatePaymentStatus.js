@@ -1,5 +1,6 @@
 import db from "../../../config/db.js"
 import AppError from "../../../utils/Apperror.js";
+import logger from "../../../utils/looger.js";
 
 export const updateOrderStatus = async (orderId, order_status,conn=db) => {
     try {
@@ -30,8 +31,7 @@ export const updateOrderStatus = async (orderId, order_status,conn=db) => {
         };
 
     } catch (error) {
-
-        console.error("Update Order Status Error:", error);
+        logger.error(`[updateOrderStatus] Failed for orderId=${orderId}: ${error.message}`);
 
         throw new AppError(
             error.statusCode || 500,

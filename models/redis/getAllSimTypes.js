@@ -9,9 +9,9 @@ export async function getSimListFromRedis(destinationId) {
     const cachedData = await redisClient.get(cacheKey);
     
     if (cachedData) {
-        const parsed = cachedData
+        const parsed = JSON.parse(cachedData);
         return {
-            sims: cachedData
+            sims: Array.isArray(parsed) ? parsed : []
         };
     }
 

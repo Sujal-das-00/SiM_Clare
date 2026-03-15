@@ -25,10 +25,11 @@ export const userLogin = async (req, res, next) => {
         if (user.status === "UNVERIFIED_EMAIL") {
             return res.status(400).json(user);
         }
+        const isProduction = process.env.NODE_ENV === "production";
         res.cookie('token', user, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'None',
+            secure: isProduction,
+            sameSite: isProduction ? 'None' : 'Lax',
             maxAge: 3600000,
         });
         res.status(200).json({ status: "success", message: "user looged in successfuly"})

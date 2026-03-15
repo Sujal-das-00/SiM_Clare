@@ -10,6 +10,7 @@ import { stripe_webhook_verifyPayment } from '../stripe/stripeWebhook.js';
 
 const app = express();
 app.use(helmet());
+app.set('trust proxy',1)
 app.disable('x-powered-by');
 
 // const frontendOrigin = [
@@ -76,7 +77,7 @@ app.use('/api', router)
 const PORT = process.env.PORT || 7000;
 
 app.get('/', (req, res) => {
-    res.send(`<h1>server is running lawde</h1>`)
+    res.send(`<h1>server is running </h1>`)
 })
 app.get("/health",limiter(5*60*1000,6), async (req, res) => {
     try {

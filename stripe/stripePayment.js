@@ -18,7 +18,6 @@ export const paymentGateway = async ({
     const targetCurrency = displayCurrency;
     const orderId = order_id;
     const productName = productname;
-    console.log(final_price," ",targetCurrency," orderid ",orderId," ",productName)
     if (typeof final_price !== "number" || final_price <= 0) {
         throw new AppError(400, "Invalid amount");
     }
@@ -26,8 +25,6 @@ export const paymentGateway = async ({
     if (!targetCurrency) {
         throw new AppError(400, "Target currency required");
     }
-    console.log("succcessurl ",process.env.PAYMENT_SUCCESS_URL)
-     console.log("fail url ",process.env.PAYMENT_CANCEL_URL)
     try {
 
         /**
@@ -36,7 +33,6 @@ export const paymentGateway = async ({
          */
         const { amount, currency } =
             await convertPriceStripe(final_price, targetCurrency);
-            console.log(amount,' curreny ',currency)
         /**
          * STEP 2 
          * NORMALIZE THE MULTIPLIER
@@ -46,7 +42,6 @@ export const paymentGateway = async ({
          * STEP 3
          * Create Stripe Checkout Session
          */
-        console.log("final payable ammount is ",normalizedAmount," and currency is ",currency,"product name",productName,"q ",quantity,"order id ",orderId)
         const session = await stripe.checkout.sessions.create({
 
             mode: "payment",
