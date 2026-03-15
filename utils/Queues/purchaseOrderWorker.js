@@ -108,7 +108,9 @@ const purchaseWorker = new Worker(
                     order_id: orderId,
                     provisioning_status: "FAILED",
                     raw_response: {
-                        message: error.message
+                        message: error.message,
+                        statusCode: error.statusCode || null,
+                        providerError: error.providerError || null
                     }
                 });
 

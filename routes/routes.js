@@ -24,9 +24,13 @@ import { convertPiceDisplay } from '../models/convertCurrencyFrontend.js';
 import { getUserHistory } from '../controllers/controllers.Userhistory.js';
 import { getUserDetailsByAdmin } from '../controllers/Admin_controllers/admin.getUserDetailsByAdmin.js';
 import { getUserEsimHistoryById } from '../controllers/Admin_controllers/admin.getUserEsimHistoryById.js';
+import { logout } from '../services/logout.js';
 
 const router = express.Router();
 router.post('/auth/login', limiter(15 * 60 * 1000, 10), userLogin);
+router.post('/auth/verify/login',limiter(15 * 60 * 1000, 10),authenticateUser)
+router.post("/auth/logout",limiter(15 * 60 * 1000, 10),logout);
+
 router.post('/auth/signup', limiter(15 * 60 * 1000, 8), userSignup);
 router.post('/auth/password/forgot/otp', limiter(10 * 60 * 1000, 5), requestOtp);
 router.post('/auth/password/reset', limiter(5 * 60 * 1000, 5), resetPassword)

@@ -28,12 +28,18 @@ export const buyEsimFromProviderService = async (payload) => {
         return response.data;
 
     } catch (error) {
-
-        logger.error("Provider eSIM purchase error:", {
+        const providerError = {
             message: error.message,
-            data: error.response?.data
-        });
+            status: error.response?.status || null,
+            statusText: error.response?.statusText || null,
+            data: error.response?.data || null
+        };
 
-        throw error;
+        logger.error("Provider eSIM purchase error:", providerError);
+
+        throw Object.assign(new Error("Provider purchase request failed"), {
+            statusCode: error.response?.status || 500,
+            providerError
+        });
     }
 };

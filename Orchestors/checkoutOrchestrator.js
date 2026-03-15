@@ -60,6 +60,7 @@ export const checkoutOrchestrator = async (data) => {
     const { finalPriceCAD, type: sim_type } = enrichedPlan[0];
     
     let final_price = finalPriceCAD
+    final_price += (finalPriceCAD * 0.025);
     let discount_amount = 0;
     let discount_value = 0;
 
