@@ -1,8 +1,8 @@
-import IORedis from "ioredis";
-import "dotenv/config";
-const bullRedis = new IORedis(process.env.REDIS_URL, {
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false
-});
+/*initially the architecture was diffrent and having the bull redis connected with unstash
+so all the variable is construced in name of bull redis as it uses the bullMq so a quick real fix
+it must work :)
+*/
 
-export default bullRedis;
+import { createRedisClient } from "./Redish_connection.js";
+
+export const bullRedis = createRedisClient()
